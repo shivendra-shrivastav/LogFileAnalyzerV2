@@ -70,8 +70,9 @@ Notes:
 - Maintain professional tone, consistent formatting, and structured section headings.
 """
 
-# Token limits for TWO-TIER processing strategy
+# Token limits for THREE-TIER processing strategy
 TOKEN_THRESHOLD_FILTERING = 150000  # Use filtering at or above this threshold
+TOKEN_THRESHOLD_METRICS_ONLY = 500000  # Use metrics-only analysis at or above this threshold
 MAX_TOKENS_PER_CHUNK = 25000         # Max tokens per chunk (safe for 30K TPM rate limit)
 # Note: Set to 25K to stay well under the 30K tokens/minute rate limit for gpt-4.1
 
@@ -166,57 +167,58 @@ def combine_log_files(log_files: List[Tuple[str, str]]) -> str:
 def process_logs_smart(
     log_content: str, 
     llm_handler: LLMHandler,
-    progress_callback=None
+    progress_callback=None,
+    force_metrics_only: bool = False
 ) -> str:
     """
-    Intelligently process logs based on size - TWO TIER APPROACH.
+    Intelligently process logs based on size - THREE TIER APPROACH.
     
     Args:
         log_content: Combined log content
         llm_handler: LLM handler instance
         progress_callback: Optional callback for progress updates
+        force_metrics_only: Force metrics-only analysis regardless of size
         
     Returns:
-        Final summary
+        Final summary (LLM-generated or metrics-based)
     """
     # Count tokens
     total_tokens = count_tokens(log_content, llm_handler.model)
     
     if progress_callback:
-        progress_callback(f"📊 Total tokens: {total_tokens:,}")
+        progress_callback(f"📊 Analyzing {total_tokens:,} tokens...")
+    
+    # Strategy 0: Metrics-only analysis (very large files or forced)
+    if force_metrics_only or total_tokens >= TOKEN_THRESHOLD_METRICS_ONLY:
+        if progress_callback:
+            progress_callback("🔍 File too large - using lightweight metrics analysis...")
+        return process_with_metrics_only(log_content, progress_callback)
     
     # Strategy 1: Direct processing (< 150K tokens)
-    if total_tokens < TOKEN_THRESHOLD_FILTERING:
+    elif total_tokens < TOKEN_THRESHOLD_FILTERING:
         if progress_callback:
-            progress_callback("✅ Processing directly (file size optimal)")
+            progress_callback("🚀 Processing directly...")
         
-        # Check if it still exceeds rate limit
-        if total_tokens > MAX_TOKENS_PER_CHUNK:
-            if progress_callback:
-                progress_callback("⚠️ File exceeds rate limit, using chunking...")
+        if total_tokens <= MAX_TOKENS_PER_CHUNK:
+            return llm_handler.generate_summary(log_content, SYSTEM_PROMPT)
+        else:
             return process_with_chunking(log_content, llm_handler, progress_callback)
-        
-        return llm_handler.generate_summary(log_content, SYSTEM_PROMPT)
     
-    # Strategy 2: Filtered processing (>= 150K tokens)
+    # Strategy 2: Filtered processing (150K - 500K tokens)
     else:
         if progress_callback:
-            progress_callback("⚙️ Applying content filtering...")
+            progress_callback("🔍 Filtering content to reduce size...")
         
         filtered_content = filter_log_content(log_content, keep_critical=True)
         filtered_tokens = count_tokens(filtered_content, llm_handler.model)
         
         if progress_callback:
-            reduction = (1 - filtered_tokens / total_tokens) * 100
-            progress_callback(f"✅ Reduced by {reduction:.1f}% ({total_tokens:,} → {filtered_tokens:,} tokens)")
+            progress_callback(f"✂️ Filtered from {total_tokens:,} to {filtered_tokens:,} tokens")
         
-        # If still too large after filtering, chunk it
-        if filtered_tokens > MAX_TOKENS_PER_CHUNK:
-            if progress_callback:
-                progress_callback("📦 Content exceeds rate limit, using chunking...")
-            return process_with_chunking(filtered_content, llm_handler, progress_callback)
-        else:
+        if filtered_tokens <= MAX_TOKENS_PER_CHUNK:
             return llm_handler.generate_summary(filtered_content, SYSTEM_PROMPT)
+        else:
+            return process_with_chunking(filtered_content, llm_handler, progress_callback)
 
 
 def process_with_chunking(
@@ -259,6 +261,190 @@ def process_with_chunking(
     return final_summary
 
 
+def process_with_metrics_only(log_content: str, progress_callback=None) -> str:
+    """
+    Process content using only metrics extraction (no LLM).
+    
+    Args:
+        log_content: Content to analyze
+        progress_callback: Optional callback for progress updates
+        
+    Returns:
+        Formatted metrics summary
+    """
+    if progress_callback:
+        progress_callback("📈 Extracting key metrics...")
+    
+    # Import here to avoid circular import
+    from log_processor import extract_key_metrics
+    
+    # Extract metrics
+    metrics = extract_key_metrics(log_content)
+    
+    if progress_callback:
+        progress_callback("📋 Formatting metrics summary...")
+    
+    # Format as a readable summary (similar to LLM output but without LLM)
+    summary = format_metrics_summary(metrics)
+    
+    return summary
+
+
+def format_metrics_summary(metrics) -> str:
+    """
+    Format extracted metrics into a structured summary similar to LLM output.
+    
+    Args:
+        metrics: LogMetrics object with extracted data
+        
+    Returns:
+        Formatted summary string
+    """
+    import re
+    
+    summary = f"""### 🧾 General Information:
+
+**<span style='color:#4e88ff'>Software</span>**: {metrics.software_version or 'Unknown'}  
+**<span style='color:#4e88ff'>Hardware</span>**: {metrics.hardware_type or 'Unknown'}  
+**<span style='color:#4e88ff'>Serial number</span>**: {metrics.serial_number or 'Unknown'}  
+**<span style='color:#4e88ff'>Period of the log entries</span>**: {metrics.log_period.get('start', 'Unknown')} to {metrics.log_period.get('end', 'Unknown')}  
+**<span style='color:#4e88ff'>Configuration file</span>**: {metrics.configuration_file or 'Unknown'}
+
+### 📌 Important Events:
+
+- **<span style='color:#ff914d'>System start & initialization</span>**  
+"""
+    
+    # Add measurements
+    if metrics.measurements:
+        summary += f"  - Found {len(metrics.measurements)} measurements\n"
+        for i, m in enumerate(metrics.measurements[:5]):
+            summary += f"  - Measurement {m['id']} started at {m['time']}\n"
+        if len(metrics.measurements) > 5:
+            summary += f"  - ... and {len(metrics.measurements) - 5} more measurements\n"
+    else:
+        summary += "  - No measurements found\n"
+    
+    summary += "\n- **<span style='color:#ff914d'>Memory check & cleanup</span>**  \n"
+    if metrics.disk_info:
+        summary += f"  - {len(metrics.disk_info)} disk space entries found\n"
+        for info in metrics.disk_info[:3]:
+            summary += f"  - {info}\n"
+    else:
+        summary += "  - No disk check information found\n"
+    
+    summary += "\n- **<span style='color:#ff914d'>Measurements & data transfer</span>**  \n"
+    if metrics.measurements:
+        for i, m in enumerate(metrics.measurements[:10]):
+            summary += f"  - {i+1}. Measurement {m['id']} started at {m['time']}\n"
+        if len(metrics.measurements) > 10:
+            summary += f"  - ... and {len(metrics.measurements) - 10} more measurements\n"
+    else:
+        summary += "  - No measurements recorded\n"
+    
+    summary += "\n- **<span style='color:#ff914d'>Error messages & warnings</span>**  \n"
+    
+    # Power events
+    if metrics.power_events:
+        summary += f"  - **Power**: Found {len(metrics.power_events)} power-related events\n"
+        for event in metrics.power_events[:3]:
+            timestamp_match = re.match(r'(\d{2}\.\d{2}\.\d{4}\s+\d{2}:\d{2}:\d{2})', event)
+            timestamp = timestamp_match.group(1) if timestamp_match else 'Unknown time'
+            description = event.split(timestamp)[-1].strip() if timestamp_match else event
+            summary += f"    - {timestamp} {description}\n"
+        if len(metrics.power_events) > 3:
+            summary += f"    - ... and {len(metrics.power_events) - 3} more power events\n"
+    else:
+        summary += "  - **Power**: No power events found\n"
+    
+    # WLAN events
+    if metrics.wlan_events:
+        disconnects = [e for e in metrics.wlan_events if e['type'] == 'disconnect']
+        connects = [e for e in metrics.wlan_events if e['type'] == 'connect']
+        summary += f"  - **WLAN**: {len(disconnects)} disconnections, {len(connects)} connections\n"
+        if disconnects:
+            summary += f"    - Last disconnect: {disconnects[-1]['time']}\n"
+        if connects:
+            summary += f"    - Last connect: {connects[-1]['time']}\n"
+    else:
+        summary += "  - **WLAN**: No WLAN events found\n"
+    
+    # CAN events (from errors/warnings)
+    can_events = []
+    for code, lines in metrics.errors.items():
+        can_events.extend([line for line in lines if 'CAN' in line.upper()])
+    for code, lines in metrics.warnings.items():
+        can_events.extend([line for line in lines if 'CAN' in line.upper()])
+    
+    if can_events:
+        summary += f"  - **CAN**: {len(can_events)} CAN-related issues found\n"
+        for event in can_events[:2]:
+            timestamp_match = re.match(r'(\d{2}\.\d{2}\.\d{4}\s+\d{2}:\d{2}:\d{2})', event)
+            timestamp = timestamp_match.group(1) if timestamp_match else 'Unknown time'
+            summary += f"    - {timestamp} CAN issue detected\n"
+    else:
+        summary += "  - **CAN**: No CAN issues found\n"
+    
+    # GPS events
+    gps_events = []
+    for code, lines in metrics.errors.items():
+        gps_events.extend([line for line in lines if 'GPS' in line.upper()])
+    for code, lines in metrics.warnings.items():
+        gps_events.extend([line for line in lines if 'GPS' in line.upper()])
+    
+    if gps_events:
+        summary += f"  - **GPS**: {len(gps_events)} GPS-related issues found\n"
+    else:
+        summary += "  - **GPS**: No GPS issues found\n"
+    
+    # Disk events
+    disk_events = []
+    for code, lines in metrics.errors.items():
+        disk_events.extend([line for line in lines if any(keyword in line.upper() for keyword in ['DISK', 'STORAGE', 'SPACE'])])
+    
+    if disk_events:
+        summary += f"  - **Disk**: {len(disk_events)} disk-related issues found\n"
+    else:
+        summary += "  - **Disk**: No disk issues found\n"
+    
+    # Protocol timeouts
+    if metrics.protocol_timeouts:
+        summary += f"  - **Protocols**: {len(metrics.protocol_timeouts)} protocol timeouts detected\n"
+        for timeout in metrics.protocol_timeouts[:3]:
+            timestamp_match = re.match(r'(\d{2}\.\d{2}\.\d{4}\s+\d{2}:\d{2}:\d{2})', timeout)
+            timestamp = timestamp_match.group(1) if timestamp_match else 'Unknown time'
+            summary += f"    - {timestamp} Protocol timeout\n"
+    else:
+        summary += "  - **Protocols**: No protocol timeouts found\n"
+    
+    summary += "\n### ✅ Conclusion:\n\n"
+    
+    # Generate conclusion based on metrics
+    if metrics.errors or metrics.warnings:
+        total_errors = sum(len(v) for v in metrics.errors.values())
+        total_warnings = sum(len(v) for v in metrics.warnings.values())
+        summary += f"⚠️ Analysis found {total_errors} errors and {total_warnings} warnings requiring attention.\n"
+    else:
+        summary += "✅ No critical errors detected in the log analysis.\n"
+    
+    if metrics.measurements:
+        summary += f"📊 {len(metrics.measurements)} measurements were successfully recorded.\n"
+    
+    if metrics.wlan_events:
+        disconnects = [e for e in metrics.wlan_events if e['type'] == 'disconnect']
+        summary += f"📶 WLAN connectivity showed {len(disconnects)} disconnection events.\n"
+    
+    if metrics.status_summary.get('cpu'):
+        cpu_values = metrics.status_summary['cpu']
+        avg_cpu = sum(cpu_values) / len(cpu_values)
+        max_cpu = max(cpu_values)
+        summary += f"💻 System performance: Average CPU {avg_cpu:.1f}%, Peak {max_cpu:.1f}%.\n"
+    
+    summary += f"\n**Note**: This analysis was generated using lightweight metrics extraction due to large file size. For detailed LLM analysis, consider filtering or splitting the log files."
+    
+    return summary
+
+
 # ===============================
 # Streamlit UI
 # ===============================
@@ -276,18 +462,32 @@ def main():
     # Header
     st.title("🛠️ IPE Log Analyzer")
     st.markdown("""
-    Welcome to the **IPE Log Analyzer**! Upload one or more `.LOG` files or `.ZIP` archives 
-    containing LOG files from your IPEmotionRT logger.
+    **Intelligent IPE log file analyzer** with **three-tier processing strategy**:
+    - 🚀 **Direct**: Small files (< 150K tokens) → Full LLM analysis
+    - 🔍 **Filtered**: Medium files (150K-500K tokens) → Filtered + LLM analysis  
+    - 📈 **Metrics-only**: Large files (≥ 500K tokens) → Fast metrics extraction (no LLM)
     
     **Features:**
-    - 🚀 Two-tier smart processing based on file size
     - 📊 Handles files of any size efficiently
-    - 🔍 Automatic filtering for large files
     - 💬 Interactive chat for follow-up questions
     - 💰 Real-time cost tracking
+    - ⚡ Zero-cost metrics analysis for large files
     
     **Supported file types:** `.LOG` files (direct upload) | `.ZIP` archives containing `.LOG` files
     """)
+    
+    # Add processing mode selection
+    st.markdown("---")
+    col1, col2 = st.columns([2, 1])
+    
+    with col1:
+        st.markdown("### 🔧 Processing Options")
+    
+    with col2:
+        force_metrics = st.checkbox(
+            "🚀 Force Metrics-Only Mode", 
+            help="Skip LLM processing and use fast metrics extraction for any file size (Zero cost)"
+        )
     
     # Sidebar settings
     with st.sidebar:
@@ -320,7 +520,8 @@ def main():
         st.markdown("---")
         st.markdown("### 📊 Processing Thresholds")
         st.caption(f"🟢 Direct: < {TOKEN_THRESHOLD_FILTERING:,} tokens")
-        st.caption(f"🟡 Filtered: ≥ {TOKEN_THRESHOLD_FILTERING:,} tokens")
+        st.caption(f"🟡 Filtered: {TOKEN_THRESHOLD_FILTERING:,} - {TOKEN_THRESHOLD_METRICS_ONLY:,} tokens")
+        st.caption(f"🔴 Metrics-only: ≥ {TOKEN_THRESHOLD_METRICS_ONLY:,} tokens")
         
         if st.session_state.get("processing_stats"):
             st.markdown("---")
@@ -422,19 +623,21 @@ def main():
             st.error("⚠️ OpenAI API key not found in secrets. Please configure it.")
             st.stop()
         
+        # Create LLM handler (even for metrics-only mode for compatibility)
         llm_handler = LLMHandler(api_key, model=model_option)
         
         # Progress container
         status_container = st.empty()
         progress_bar = st.progress(0.0)
         
-        def update_progress(message):
+        def update_progress(message, value=None):
             status_container.info(message)
+            if value is not None:
+                progress_bar.progress(value)
         
         try:
             # Extract log files
-            update_progress("📂 Extracting log files...")
-            progress_bar.progress(0.1)
+            update_progress("📂 Extracting log files...", 0.1)
             
             log_files = process_uploaded_files(uploaded_files)
             
@@ -442,61 +645,90 @@ def main():
                 st.error("❌ No LOG files found in the uploaded files!")
                 st.stop()
             
-            update_progress(f"✅ Found {len(log_files)} LOG file(s): {', '.join([f[0] for f in log_files[:3]])}")
-            progress_bar.progress(0.2)
+            update_progress(f"✅ Found {len(log_files)} LOG file(s): {', '.join([f[0] for f in log_files[:3]])}", 0.2)
             
             # Combine logs
-            update_progress("🔗 Combining log files...")
+            update_progress("🔗 Combining log files...", 0.3)
             log_content = combine_log_files(log_files)
-            progress_bar.progress(0.3)
             
-            # Process logs
-            update_progress("🤖 Analyzing logs...")
-            progress_bar.progress(0.4)
-            
-            # Track stats
+            # Count initial tokens
             initial_tokens = count_tokens(log_content, "gpt-4")
+            update_progress(f"📊 Counted {initial_tokens:,} tokens", 0.4)
+            
+            # Determine strategy
+            if force_metrics:
+                strategy = "Metrics-only (forced)"
+                update_progress("🚀 Processing with metrics-only analysis (forced)...", 0.5)
+            elif initial_tokens >= TOKEN_THRESHOLD_METRICS_ONLY:
+                strategy = "Metrics-only (auto)"
+                update_progress("📈 File too large - using metrics-only analysis...", 0.5)
+            elif initial_tokens >= TOKEN_THRESHOLD_FILTERING:
+                strategy = "Filtered + LLM"
+                update_progress("🔍 Using filtered LLM analysis...", 0.5)
+            else:
+                strategy = "Direct LLM"
+                update_progress("🚀 Using direct LLM analysis...", 0.5)
             
             # Track progress manually
-            current_progress = [40]  # Use list to allow modification in nested function
-            
             def progress_with_bar(msg):
-                update_progress(msg)
-                current_progress[0] = min(90, current_progress[0] + 5)
-                progress_bar.progress(current_progress[0] / 100)
+                update_progress(msg, 0.7)
             
-            reply = process_logs_smart(log_content, llm_handler, progress_with_bar)
-            
-            # Store LLM handler for follow-up questions
-            st.session_state.llm_handler = llm_handler
+            # Process logs
+            reply = process_logs_smart(
+                log_content, 
+                llm_handler, 
+                progress_with_bar,
+                force_metrics_only=force_metrics
+            )
             
             # Store results
             st.session_state.messages.append({"role": "system", "content": SYSTEM_PROMPT})
             st.session_state.messages.append({"role": "assistant", "content": reply})
             st.session_state.summarized = True
             
-            # Get usage stats from LLM handler
-            usage_stats = llm_handler.get_usage_stats()
+            # Get usage stats (will be empty for metrics-only)
+            if not force_metrics and initial_tokens < TOKEN_THRESHOLD_METRICS_ONLY:
+                usage_stats = llm_handler.get_usage_stats()
+                st.session_state.llm_handler = llm_handler
+            else:
+                usage_stats = {
+                    'api_calls': 0,
+                    'input_tokens': 0,
+                    'output_tokens': 0,
+                    'total_tokens': 0,
+                    'cost': {
+                        'total_cost': 0.0,
+                        'input_cost': 0.0,
+                        'output_cost': 0.0,
+                        'model': 'Metrics-only'
+                    }
+                }
             
-            # Store stats with cost information
+            # Store stats
             st.session_state.processing_stats = {
                 'tokens': initial_tokens,
-                'strategy': 'Optimized',
+                'strategy': strategy,
                 'files': len(log_files),
                 'cost': usage_stats
             }
             
-            progress_bar.progress(1.0)
-            status_container.success("✅ Log analysis complete!")
+            update_progress("✅ Analysis complete!", 1.0)
             
             # Display cost immediately
-            st.info(f"""
-            💰 **Processing Cost:** ${usage_stats['cost']['total_cost']:.4f}
-            - API Calls: {usage_stats['api_calls']}
-            - Input Tokens: {usage_stats['input_tokens']:,}
-            - Output Tokens: {usage_stats['output_tokens']:,}
-            - Model: {usage_stats['cost']['model']}
-            """)
+            if usage_stats['cost']['total_cost'] > 0:
+                st.info(f"""
+                💰 **Processing Cost:** ${usage_stats['cost']['total_cost']:.4f}
+                - API Calls: {usage_stats['api_calls']}
+                - Input Tokens: {usage_stats['input_tokens']:,}
+                - Output Tokens: {usage_stats['output_tokens']:,}
+                - Model: {usage_stats['cost']['model']}
+                """)
+            else:
+                st.success("🚀 **Processing Cost:** $0.00 (Metrics-only analysis)")
+            
+            # Clear progress indicators
+            status_container.empty()
+            progress_bar.empty()
             
         except Exception as e:
             st.error(f"❌ Error during processing: {str(e)}")
@@ -520,7 +752,24 @@ def main():
         st.markdown("---")
         st.subheader("💬 Ask Follow-up Questions")
         
+        # Check if LLM is available for follow-up
+        if st.session_state.get('llm_handler') is None and st.session_state.processing_stats.get('strategy', '').startswith('Metrics-only'):
+            st.info("💡 **Note**: Follow-up questions require LLM processing. Metrics-only analysis doesn't support chat. Try forcing Direct/Filtered mode for smaller files.")
+        
         if prompt := st.chat_input("Ask a question about the logs..."):
+            # Check if we have LLM handler
+            if 'llm_handler' not in st.session_state or st.session_state.llm_handler is None:
+                if st.session_state.processing_stats.get('strategy', '').startswith('Metrics-only'):
+                    st.error("❌ Follow-up questions are not available in metrics-only mode. Please re-analyze with LLM processing enabled.")
+                else:
+                    # Try to create new LLM handler
+                    try:
+                        api_key = st.secrets["OPENAI_API_KEY"]
+                        st.session_state.llm_handler = LLMHandler(api_key, model=model_option)
+                    except Exception as e:
+                        st.error(f"❌ Could not initialize LLM handler: {str(e)}")
+                        st.stop()
+            
             # Add user message
             st.session_state.messages.append({"role": "user", "content": prompt})
             
@@ -531,12 +780,6 @@ def main():
             with st.chat_message("assistant"):
                 with st.spinner("Thinking..."):
                     try:
-                        api_key = st.secrets["OPENAI_API_KEY"]
-                        
-                        # Reuse existing llm_handler if available in session state
-                        if 'llm_handler' not in st.session_state:
-                            st.session_state.llm_handler = LLMHandler(api_key, model=model_option)
-                        
                         llm_handler = st.session_state.llm_handler
                         reply = llm_handler.answer_question(st.session_state.messages)
                         st.session_state.messages.append({"role": "assistant", "content": reply})
