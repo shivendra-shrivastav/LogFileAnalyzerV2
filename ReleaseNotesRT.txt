@@ -1,0 +1,1385 @@
+Release Notes
+__________________________________________________________________________________________________________
+
+Bitte beachten Sie, dass die Release Notes nur in englischer Sprache verfügbar sind.
+Veuillez faire attention à ce que les Release Notes sont seulement disponible en anglais.
+Please note that the release notes are only available in english language.
+__________________________________________________________________________________________________________
+ 
+Application:		IPEmotionRT
+Last entry: 		23.07.2025
+Current version: 	2025 R2
+The distribution of beta versions or release candidates to customers is not enabled without authorization of 
+the management.
+ 
+System requirements for RT.UI:
+*	Screen resolution: min. 1080 x 800 pixel
+*	Processor: min. 2 GHz
+*	RAM: min. 2048 MB
+*	DirectX 9
+Recommended system requirements for RT.UI:
+*	Screen resolution: min. 1920 x 1200 pixel
+*	Processor: min. 3 GHz Multi-Core
+*	RAM: min. 6144 MB
+*	Storage medium type: SSD
+*	DirectX 11
+Supported platforms for RT.UI:
+*	Microsoft Windows 10  (64 Bit operating systems)
+*	Microsoft Windows 11
+The following software will be installed for RT.UI:
+*	Microsoft Visual C++ 2019 Redistributable
+The following software is required for RT.UI:
+* 	Microsoft .NET 4.8.1 Framework
+PlugIns included in the distribution:
+*	IPETRONIK X V02.22.02
+*	IPETRONIK HV PMD V01.02.00
+*	Protocols PlugIn V03.12.00
+*	IPEsensors PlugIn V01.01.00
+*	Video PlugIn V01.04.00
+*	Audio PlugIn V01.00.00
+*	GPS PlugIn V01.06.00
+*	ETH PlugIn V01.03.00
+*	EtherCAT PlugIn V01.01.01
+*	LoggerIO PlugIn V01.02.00
+*	Status PlugIn V01.00.02
+*	Demo PlugIn V01.06.00
+*	MODbus PlugIn V01.02.02
+*	SIEMENS PLC PlugIn V01.08.00
+*	Aerospace PlugIn V01.00.00
+Versions of internal components
+*	Linux kernel 6.6.36
+*	IPE853 - PIC V01.08.03
+*	IPE853 - FPGA V02.10.18
+*	IPElog2 - PIC V01.08.03
+*	IPElog2 16 CAN FD - FPGA V02.04.02
+*	IPElog2 10 CAN FD 6 LIN - FPGA V02.04.02
+*	MLOG V3 - PIC V01.06.00
+*	M-LOG V3 12 CAN FD - FPGA V02.02.00
+*	M-LOG V3 8 CAN 4 LIN - FPGA V02.02.00
+*	M-LOG V3 8 CAN FD 2 ETH - FPGA V02.02.00
+*	M-LOG V3 6 CAN 2 LIN 2 ETH - FPGA V02.02.00
+*	µCROS SL - PIC V01.00.32
+*	ARCOS 1.5 - PIC V02.00.90
+*	ARCOS 2 - PIC V01.03.01
+*	COMgateV3 V01.02.06
+*	LANTRONIX V8.9.0.0R4
+*	CAN FD Satellite 2.130
+* 	FlexRay Satellite 1.104
+* 	FlexRay Satellite CLFDv3 3.10
+*	LIN Satellite 2.128
+*	IPEmotion ME 3.7.2
+*	DriveView 2.7.0
+Versions of external components used in testing:
+*	Technica CM-100/LIN Combo/CAN Combo V20.xx/V21.xx
+
+The IPEmotion program folder must be installed locally.
+__________________________________________________________________________________________________________
+
+Rights
+
+IPEmotion PlugIn IPEmotionRT needs administrator rights during installation. Standard user rights are needed for working with 
+IPEmotion PlugIn IPEmotionRT.
+
+__________________________________________________________________________________________________________
+
+Content
+
+The following points describe changes, restrictions and bugs in the corresponding versions:
+
+2025 R2
+Cyber security
+ETH gateway V2
+On change for J1939 DM1
+File format options for MDF4, PCAP and PCAPNG
+Text operations for formulas
+XCP: Support for text signals
+Currently used IEV in storage group header
+FlexRay null frames
+Traffic counter for WiFi and Modem
+Time difference check between PC and logger
+Limit output place 'IPEcloud2'
+'App enabled' column is visible by default
+'Task' for formulas
+Status signals 'Available memory' and 'Load value'
+Free disk space message extented for RAW/MEA
+FixedBug:   Requesting a DHCP address from a mobile hotspot that does not support requests of broadcast repliest may take more than one minute.
+FixedBug:   PW2050 WiFi module: The module will not respond if it is overloaded due to network congestion, e.g. excessive ARP requests. This will cause the WLAN connection to drop.
+FixedBug:   When shutting down IPE833 with a shutdown event and CL-15 connected, the IPE833 supply voltage is not valid
+
+Known restrictions:
+IPE853: Bluetooth works with WiFi 5 GHz, with WiFi 2.4 GHz Bluetooth is not supported.
+For technical reasons, a mobile access point is forced to change its channel under certain circumstances, which leads to wifi connection drops at client side. The probability of this channel hopping increases significantly if the infrastructure mode (a profile for Wireless LAN exists) and the access point mode are configured on the datalogger/gateway at the same time. If the wifi interface is used for measurement it is recommended to remove all those profiles for Wireless LANs which are used for remote data transfer to servers.
+Parallel usage of UDS signals and services for same ECU in parallel
+Mobile display works not correct on Win8.1 or later when display scaling is not set to 100% in windows
+Syslog messages in IPEmotion ME of IPEhub2 are not supported yet
+Video in online view of RT.UI might flicker
+
+2025 R1
+Routing of traffic between interfaces
+ASAM CMP: send and/or forward data
+XCP-Master via WiFi
+ASAM CMP virtual device
+Support for MDF4.3
+MDF4 performance improvements
+New IPEmotion ME with reference column and Bluetooth support
+Optional access control for IPEmotion ME via browser
+Technica CM-10BASE-T1S
+Special handling for Bluetooth connection
+Power Calculations ? multiphase: Online
+Color coding of thermo couples
+License flag for PAK-live
+Split message shows signal name
+FixedBug:   IPEmotionME-Authentication: When using the Microsoft Edge? browser, the authentication prompt may appear twice.
+FixedBug:   Firmware version was not read by USB connections
+
+Known restrictions:
+IPE853: Bluetooth works with WiFi 5 GHz, with WiFi 2.4 GHz Bluetooth is not supported.
+For technical reasons, a mobile access point is forced to change its channel under certain circumstances, which leads to wifi connection drops at client side. The probability of this channel hopping increases significantly if the infrastructure mode (a profile for Wireless LAN exists) and the access point mode are configured on the datalogger/gateway at the same time. If the wifi interface is used for measurement it is recommended to remove all those profiles for Wireless LANs which are used for remote data transfer to servers.
+Parallel usage of UDS signals and services for same ECU in parallel
+Mobile display works not correct on Win8.1 or later when display scaling is not set to 100% in windows
+Syslog messages in IPEmotion ME of IPEhub2 are not supported yet
+When shutting down IPE833 with a shutdown event and CL-15 connected, the IPE833 supply voltage is not valid
+Video in online view of RT.UI might flicker
+
+2024 R3.3
+FixedBug-unverified:   Communication: Fixed the problem with resetting parameters for the modem (case 81687)
+
+Known restrictions:
+IPE853: Bluetooth works with WiFi 5 GHz, with WiFi 2.4 GHz Bluetooth is not supported.
+For technical reasons, a mobile access point is forced to change its channel under certain circumstances, which leads to wifi connection drops at client side. The probability of this channel hopping increases significantly if the infrastructure mode (a profile for Wireless LAN exists) and the access point mode are configured on the datalogger/gateway at the same time. If the wifi interface is used for measurement it is recommended to remove all those profiles for Wireless LANs which are used for remote data transfer to servers.
+Parallel usage of UDS signals and services for same ECU in parallel
+Mobile display works not correct on Win8.1 or later when display scaling is not set to 100% in windows
+Syslog messages in IPEmotion ME of IPEhub2 are not supported yet
+When shutting down IPE833 with a shutdown event and CL-15 connected, the IPE833 supply voltage is not valid
+Video in online view of RT.UI might flicker
+
+2024 R3.2
+
+Known restrictions:
+IPE853: Bluetooth works with WiFi 5 GHz, with WiFi 2.4 GHz Bluetooth is not supported.
+For technical reasons, a mobile access point is forced to change its channel under certain circumstances, which leads to wifi connection drops at client side. The probability of this channel hopping increases significantly if the infrastructure mode (a profile for Wireless LAN exists) and the access point mode are configured on the datalogger/gateway at the same time. If the wifi interface is used for measurement it is recommended to remove all those profiles for Wireless LANs which are used for remote data transfer to servers.
+Parallel usage of UDS signals and services for same ECU in parallel
+Mobile display works not correct on Win8.1 or later when display scaling is not set to 100% in windows
+Syslog messages in IPEmotion ME of IPEhub2 are not supported yet
+When shutting down IPE833 with a shutdown event and CL-15 connected, the IPE833 supply voltage is not valid
+Video in online view of RT.UI might flicker
+
+2024 R3.1
+FixedBug:   Data offset for header mode 'NAX-CTR-LEN' corrected (case 79490)
+FixedBug-unverified:   Max sample rate of UDS status signal corrected (case 79349)
+
+Known restrictions:
+IPE853: Bluetooth works with WiFi 5 GHz, with WiFi 2.4 GHz Bluetooth is not supported.
+Mobile display works not correct on Win8.1 or later when display scaling is not set to 100% in windows
+Parallel usage of UDS signals and services for same ECU in parallel
+Syslog messages in IPEmotion ME of IPEhub2 are not supported yet
+Video in online view of RT.UI might flicker
+
+2024 R3
+New fan behaviour for ARCOS2
+Support for ADIO interface
+VTAB support for internal signals (Wakeup reson, WiFi state,...)
+Using J1939 DM1 error codes as trigger
+Using UDS DTCs as trigger
+LIN schedule tables
+LIN: Extended request timeout
+Configuration check for Technica devices
+Support for PCAPNG file format
+Adding event trigger to mdf4 files
+Support for radius server
+rho_qp
+Additional log messages
+Updating RT loggers: check license before update
+iDDS multi point scaling
+FixedBug-unverified:   Only 8 wifi connections can be active at the same time and duplicate SSIDs are no longer possible (case 77082)
+FixedBug:   Parallel usage of UDS signals and services for same ECU in parallel (case 65857)
+
+Known restrictions:
+Mobile display works not correct on Win8.1 or later when display scaling is not set to 100% in windows
+Syslog messages in IPEmotion ME of IPEhub2 are not supported yet
+Video in online view of RT.UI might flicker
+
+2024 R2.2
+FixedBug-unverified:   XCP trigger might cause buffer overflow (case 78406)
+FixedBug:   Channel description in MDF4 format in default mode (case 75414)
+FixedBug:   IPEmotionME restart (case 76966)
+
+Known restrictions:
+Mobile display works not correct on Win8.1 or later when display scaling is not set to 100% in windows
+Parallel usage of UDS signals and services for same ECU in parallel
+Syslog messages in IPEmotion ME of IPEhub2 are not supported yet
+Video in online view of RT.UI might flicker
+
+2024 R2.1
+FixedBug-unverified:   Image update from 2023 to 2024 R2 might cause problems (case 78054, 78027, 77967 , 78190, 78145)
+FixedBug-unverified:   8-bit mode for CCP protocol status adapted (case 72865)
+
+Known restrictions:
+Mobile display works not correct on Win8.1 or later when display scaling is not set to 100% in windows
+Parallel usage of UDS signals and services for same ECU in parallel
+Syslog messages in IPEmotion ME of IPEhub2 are not supported yet
+Video in online view of RT.UI might flicker
+
+2024 R2
+Support for ETHOS2 including hotplug functionality
+Supporting 12 ETH interfaces at Technica CM-100/CM-1000
+IPE833-002 with automotive ETHERNET
+Support for IPE833 with internal battery
+Direct data transfer from RAW partition if MEA partition is corrupt
+Amazon S3 storage
+Support for SMB/Windows network drives
+Unique host name for logger using logger id
+Additional shutdown for ARCOS2 via button
+iMICusb adaptions
+Comment edit als logger node	
+MEA upload to new IPEcloud
+IPEaeroApi
+New MEA number as property
+PAK connection configureable via options
+
+Known restrictions:
+Mobile display works not correct on Win8.1 or later when display scaling is not set to 100% in windows
+Parallel usage of UDS signals and services for same ECU in parallel
+Syslog messages in IPEmotion ME of IPEhub2 are not supported yet
+Video in online view of RT.UI might flicker
+
+2024 R1.3
+FixedBug:  MDF4 grouped with NML  (case 76836)
+FixedBug:  MDF4 grouped with pre-trigger  (case 77113)
+FixedBug:  SFTP with Curve2551
+FixedBug:  RT.UI import with categories  (case 77020)
+FixedBug:  IPEaeroApi: M-THERMO 3
+
+Known restrictions:
+Parallel usage of UDS signals and services for same ECU in parallel
+Mobile display works not correct on Win8.1 or later when display scaling is not set to 100% in windows
+Syslog messages in IPEmotion ME of IPEhub2 are not supported yet
+Video in online view of RT.UI might flicker
+Using a COMgateV3 can lead to problems when detecting the M-LOG V3
+
+2024 R1.2
+FixedBug:   QuickStart not working if status module is used
+
+Known restrictions:
+Parallel usage of UDS signals and services for same ECU in parallel
+Mobile display works not correct on Win8.1 or later when display scaling is not set to 100% in windows
+Syslog messages in IPEmotion ME of IPEhub2 are not supported yet
+Video in online view of RT.UI might flicker
+
+2024 R1.1
+FixedBug:   NML with µCROS SL (case 74711)
+
+Known restrictions:
+Parallel usage of UDS signals and services for same ECU in parallel
+Mobile display works not correct on Win8.1 or later when display scaling is not set to 100% in windows
+Syslog messages in IPEmotion ME of IPEhub2 are not supported yet
+Video in online view of RT.UI might flicker
+
+2024 R1
+USB camera: IPE-CAM 007
+IPETRONIK HV PMD-002
+Bluetooth® support for ARCOS2, ETHOS, µCROS SL
+RT.UI via Bluetooth*
+Telemetry data for IPEcloud
+IPE833-001: ETH connector as measurement input
+Edge/level for storage group start trigger
+Support for XCP A2L with EVENT_CAN_ID_LIST
+Default value for AppEnabled
+IPE-DXS: Proxy settings for Azure connections
+Use file prefix for MDF4 video files
+ODB extended mode extension
+Transmitting remote frames via scripting
+Proxy settings for Azure connections
+External modem via USBtoETH
+New license flag 'Storage'
+New IPE833 image with complete CL-15 support
+CM-1000: Bench tests and vehicle integration tests pending.
+
+Known restrictions:
+Parallel usage of UDS signals and services for same ECU in parallel
+Mobile display works not correct on Win8.1 or later when display scaling is not set to 100% in windows
+Syslog messages in IPEmotion ME of IPEhub2 are not supported yet
+Video in online view of RT.UI might flicker
+
+2023 R3.3
+FixedBug:   Motion format for USB cameras might not stop acquisition properly (case 73617)
+FixedBug:   Stopping XCP measurement  with many polling labels (case 74730)
+FixedBug:   FTP data transfer with spaces (case 73427)
+
+Known restrictions:
+Parallel usage of UDS signals and services for same ECU in parallel
+Mobile display works not correct on Win8.1 or later when display scaling is not set to 100% in windows
+Syslog messages in IPEmotion ME of IPEhub2 are not supported yet
+Video in online view of RT.UI might flicker
+
+2023 R3.2
+FixedBug-unverified:   Storage group empty if IP camera is disconnected (case 73260)
+
+Known restrictions:
+Parallel usage of UDS signals and services for same ECU in parallel
+Mobile display works not correct on Win8.1 or later when display scaling is not set to 100% in windows
+Syslog messages in IPEmotion ME of IPEhub2 are not supported yet
+Video in online view of RT.UI might flicker
+
+2023 R3.1
+Logger security
+Support for iMICusb
+IPE833: Internal signals, gyro, acceleration
+Support for classification data in MDF4
+Virtual master channel for MDF4
+One group for event based signals with identical time line in MDF4 grouped format
+MDF4-CAN-Traffic: CAN and CAN-FD frames located in one MDF4 group
+CMP: Version infos in log file
+File systemtype info in user log
+CPU load message cycle reduced to 5min
+WakeOnSMS message at shutdown
+Free disk space obervation for internal partition
+New tree list column 'Front number'
+Refrigerant R449A, R32 and R600	
+IPEcrypt for Linux	
+
+Known restrictions:
+Parallel usage of UDS signals and services for same ECU in parallel
+Mobile display works not correct on Win8.1 or later when display scaling is not set to 100% in windows
+Syslog messages in IPEmotion ME of IPEhub2 are not supported yet
+Video in online view of RT.UI might flicker
+iDDS can only be used with restrictions
+
+2023 R2.2
+FixedBug:   LIN signals via Technica (case 72444)
+
+Known restrictions:
+Parallel usage of UDS signals and services for same ECU in parallel
+Mobile display works not correct on Win8.1 or later when display scaling is not set to 100% in windows
+Syslog messages in IPEmotion ME of IPEhub2 are not supported yet
+Video in online view of RT.UI might flicker
+
+2023 R2.1
+ARCOS 2
+IPE833-001
+
+Known restrictions:
+Parallel usage of UDS signals and services for same ECU in parallel
+Mobile display works not correct on Win8.1 or later when display scaling is not set to 100% in windows
+Syslog messages in IPEmotion ME of IPEhub2 are not supported yet
+Video in online view of RT.UI might flicker
+
+2023 R2
+Component "Status" for Flexray interfaces
+CMP for Technica devices
+Suppport PTP two step sync for X devices with firmware >= V02.19.xx for better synchronity
+Support for WLAN with hidden SSIDs
+Support for SFP+ ports for data transfer
+Log files even at power bad
+Complete image update without valid wake condition
+IPEaeroApi
+
+Known restrictions:
+Parallel usage of UDS signals and services for same ECU in parallel
+Mobile display works not correct on Win8.1 or later when display scaling is not set to 100% in windows
+Syslog messages in IPEmotion ME of IPEhub2 are not supported yet
+Video in online view of RT.UI might flicker
+
+2023 R1.4
+FixedBug-unverified:   Possible connection loss at XCPonCAN FD with high bus load (case 75028)
+
+Known restrictions:
+Mobile display works not correct on Win8.1 or later when display scaling is not set to 100% in windows
+Parallel usage of UDS signals and services for same ECU in parallel
+Syslog messages in IPEmotion ME of IPEhub2 are not supported yet
+Video in online view of RT.UI might flicker
+
+2023 R1.1
+GPS did not work on all µCROS SL
+
+2023 R1
+HV online calculations
+IPEhub2
+Storage mode 'Snapshot'
+Execute commands via limits
+Support for multiplexed PDU signals
+DAQ list trigger
+J1939-NMEA2000
+Channel name adaption at connector name change
+MDF4 header extensions
+Remote update of X-/CAN devices
+Syncronization for HV PMD
+Infos for HV PMD
+Always online can be deactivated per medium
+Extended configuration data in ziprt container
+User message at unsupported WakeOnETH hardware
+License flags splitted
+Extended log messages
+Support for Intel neural stick 2
+New Linux kernel 5.15.40
+GPS data handling optimized
+
+Known restrictions:
+Possible time drift of X devices to other devices in comparison to other signals
+Parallel usage of UDS signals and services for same ECU in parallel
+Mobile display works not correct on Win8.1 or later when display scaling is not set to 100% in windows
+Syslog messages in IPEmotion ME of IPEhub2 are not supported yet
+Video in online view of RT.UI might flicker
+
+2022 R3.3
+FixedBug-unverified:   Excpetion with PLP/TECMP (case 72653)
+FixedBug-unverified:   XCP on XCPonCAN FD  (case 71765)
+
+Known restrictions:
+Parallel usage of UDS signals and services for same ECU in parallel
+Mobile display works not correct on Win8.1 or later when display scaling is not set to 100% in windows
+Syslog messages in IPEmotion ME of IPEhub2 are not supported yet
+Video in online view of RT.UI might flicker
+
+2022 R3.2
+FixedBug-unverified:   Max ODT entries default for XCPonCAN FD adapted (case 69345)
+FixedBug-unverified:   FlexRay satellite firmware V01.104 (case 70888)
+
+Known restrictions:
+Parallel usage of UDS signals and services for same ECU in parallel
+Mobile display works not correct on Win8.1 or later when display scaling is not set to 100% in windows
+Syslog messages in IPEmotion ME of IPEhub2 are not supported yet
+Video in online view of RT.UI might flicker
+
+2022 R3.1
+FixedBug:   ziprt files are now named ziprttemp in order to prevent copying incomplete data (case 68320)
+
+Known restrictions:
+Possible time drift of X devices to other devices in comparison to other signals
+Parallel usage of UDS signals and services for same ECU in parallel
+Mobile display works not correct on Win8.1 or later when display scaling is not set to 100% in windows
+Video in online view of RT.UI might flicker
+
+2022 R3
+Data transfer supproting azure cloud
+LIN wakeup/quickstart/NML
+Quickstart data of CM-100
+Start trigger for ring buffer storage groups
+CAN-FD-Send
+Direct use of downloaded IEV files
+Use Refprop 10 and add R454B and R513A
+Start messages in all user logs
+New user event 'Shutdown direct'
+XCP second tester: Optional no retry after tester detection
+SFTP support for resume when downloading files
+IEV messages extended
+Additional channel type specific channel grid columns
+Import of EtherCAT eni files
+EtherCAT support output signals
+Additional messages in user log file (e.g. drive info, modem access type)
+FixedBug:   Currently Quickstart cannot be used error-free in connection with MDF4 storage groups (case 62874, 64153, 65510, 65670, 65717)
+FixedBug:   Mobile display: Fix problem with missing signals (case 66865)
+
+Known restrictions:
+Possible time drift of X devices to other devices in comparison to other signals
+Mobile display works not correct on Win8.1 or later when display scaling is not set to 100% in windows
+Parallel usage of UDS signals and services for same ECU in parallel
+Sporadic loss of connection of RT.UI to logger possible
+Video in online view of RT.UI might flicker
+
+2022 R2.3
+FixedBug:   New COMgate firmware V01.02.06  included in update container (case 66786)
+FixedBug:   XCP: Correction for MaxOdtEntrySizeDaq
+
+Known restrictions:
+Possible time drift of X devices to other devices in comparison to other signals
+Mobile display works not correct on Win8.1 or later when display scaling is not set to 100% in windows
+Parallel usage of UDS signals and services for same ECU in parallel
+Sporadic loss of connection of RT.UI to logger possible
+Video in online view of RT.UI might flicker
+
+2022 R2.1
+FixedBug-unverified:   IPElog2 WLAN reset handling adapted (case 65764)
+FixedBug-unverified:   PLP/TECMP data might be missing after restarting a measurement (case 65841)
+FixedBug-unverified:   Parallel usage of UDS signals and services for same ECU in parallel (case 65857)
+FixedBug:   Cyclic UDS job freqeuency not always correct (case 66200)
+FixedBug:   DriveView skin settings not saved
+
+Known restrictions:
+Possible time drift of X devices to other devices in comparison to other signals
+Sporadic loss of connection of RT.UI to logger possible
+Video in online view of RT.UI might flicker
+
+2022 R2
+iDDS on IPEhub2
+EtherCAT master
+Event based XCP calibrations
+File size reduction for IPEmotion format for storage rates less than sample rate
+XCPonETH with IPv6
+XCP slave with IPv6
+LIN status module
+Configuration of always online parameters
+PC interface for LAN data transfer
+ETH PDU protocol: Support of container PDUs with ID
+Writing files for readout station
+Second tester retry timeout
+Maximum file size for storage groups changeable
+Additional climate formulas t_hp and s_hp
+Importing menu for log files
+New firmware versions for satellites and interfaces
+exFAT for MEA partition for new logger setups
+DLT with IPv6
+FixedBug-unverified:   NML might not work after power bad
+FixedBug:   Don't display messages about connection status of inactive X or M devices
+FixedBug:   Currently Quickstart cannot be used error-free in connection with MDF4 storage groups (case 62874, 64153, 65510, 65670, 65717)
+FixedBug:   New COMgateV3 firmware V01.02.04
+
+Known restrictions:
+Possible time drift of X devices to other devices in comparison to other signals
+Sporadic loss of connection of RT.UI to logger possible
+Video in online view of RT.UI might flicker
+
+2022 R1.1
+Supported Languages: Korean, Chinese (simplified)
+FixedBug:   Checksum calculation of LIN satellite might be wrong
+
+Known restrictions:
+Possible time drift of X devices to other devices in comparison to other signals
+Sporadic loss of connection of RT.UI to logger possible
+Video in online view of RT.UI might flicker
+
+2022 R1
+Support for IPETRONIK HV PMD
+DoIP/WWH-OBD (Application tests pending)
+Status signals for ETHERNET
+NML/QS/WakeUp for satellites (contact support about hardware requirements) 	 
+Prioritization of storage targets
+exFAT support for stick and external storage media
+WakeOnRTC for IPElog2
+WakeOnSMS for IPElog2
+MQTT switch between WiFi and Modem
+Extended error handling including reboot and mail
+Support for config and program update with reboot including always retry for FTP
+IP address of WiFi AP changeable
+New xml parser used for RT.UI for faster data exchange
+Arinc429 aerospace (Application tests pending)
+New Linux kernel
+FixedBug:   Fixed paste from file for mail groups that could lead to a crash at the start of measurement (case 64311; 64704)
+
+Known restrictions:
+Currently Quickstart cannot be used error-free in connection with MDF4 storage groups
+Possible time drift of X devices to other devices in comparison to other signals
+Sporadic loss of connection of RT.UI to logger possible
+Climate operation h_std with fluid R600a is not always correct
+Video in online view of RT.UI might flicker
+
+2021 R2.1
+FixedBug:   Logger messages were possibly not displayed in the output window
+
+Known restrictions:
+Possible time drift of X devices to other devices in comparison to other signals
+HTML5 app at M-LOG V3 with COMgateV3 via 192.168.236.1
+Mobile display works not correct on Win8.1 or later when display scaling is not set to 100% in windows
+Sporadic loss of connection of RT.UI to logger possible
+Climate operation h_std with fluid R600a is not always correct
+Initial IP addresses of the logger are 192.168.234.1 for ETH, 192.168.232.1 for X-LINK, 192.168.236.1 for PC, 192.168.237.1 for WLAN
+Video in online view of RT.UI might flicker
+
+2021 R2
+On change storage for traffic channels
+CCP seed and key via windows dll
+Switch of CAN and ETH power at full post proccessing
+PCAP as native format for ETH traffic
+DLT signal measurement from FIBEX
+Wake on bus and quickstart for M-LOG V3
+Quickstart on interfaces without WakeOnBus
+Categories per FTP server
+PDU signal measurement with IPv6
+CAN FD error frames
+Optional IP addess for X-LINK interface
+Reset connection devices to default
+Hardware description file extended including log messages for new items
+Multiplexer handling for J1939 signals
+Preview for FTP sub directory
+Second tester and EPK check messages are no more repeated cyclically
+Additional log message for necessary reboot
+Predefined provider settings for Sierra Wireless
+Optional WiFi band restriction
+Data transfer timeout default set to 10s
+IEV export to IRF container
+Second tester tooltip extended
+Traffic with index as default
+Satellite firmware uodate checks versions
+Renaming for MCAN in new configurations
+WiFi access point can be de-/activated via RT.UI
+Flag for channel deactivating concerning IPEmotion ME
+SIEMENS PLC via TCP/IP
+Diagnostic mode no more setable via GUI
+FixedBug-unverified:   Fixed handling of UInt64 parameter values when a max limit of UInt64.MaxValue was specified in PDX file.
+FixedBug-unverified:   COMgate / ublox modem: [CA-90921 / u-blox ID-2 3492] In some mobile networks, when the LTE network deploys SIB24 for 4G-to-5G SA reselection, the module receives scheduling information in SIB1 which contains SIB Type = sibType24-v1530. The current firmware does not handle this newly defined value, which results in dropping the SIB1 message. Consequently, the cell that broadcasts SIB24 is considered as barred, and eventually the module will move to 2G or 3G network and lose 4G services.
+FixedBug:   Possible time drift of X devices to other devices in comparison to other signals
+
+Known restrictions:
+HTML5 app at M-LOG V3 with COMgateV3 via 192.168.236.1
+Mobile display works not correct on Win8.1 or later when display scaling is not set to 100% in windows
+Sporadic loss of connection of RT.UI to logger possible
+Climate operation h_std with fluid R600a is not always correct
+Initial IP addresses of the logger are 192.168.234.1 for ETH, 192.168.232.1 for X-LINK, 192.168.236.1 for PC, 192.168.237.1 for WLAN
+Video in online view of RT.UI might flicker
+
+2021 R1.2
+FixedBug:   NML/Quickstart not possible for high bus load (case 57929)
+FixedBug:   CM-100 needs to be run with deactivated options 'Logger ready' and '802.1AS Master Detected' or firmware vesion 16 has to be used. (case 62456)
+FixedBug:   LIN outputs in master mode (case 62782)
+FixedBug:   J1939 data could be missing (case 63386)
+FixedBug-unverified:   DLT considers DLS0x1 header
+FixedBug-unverified:   SIM card number will be included in log indepent of unlock process (case 63524)
+FixedBug-unverified:   New COMgatev3 firmware with corrections (case 62532)
+
+Known restrictions:
+HTML5 app at M-LOG V3 with COMgateV3 via 192.168.236.1
+Mobile display works not correct on Win8.1 or later when display scaling is not set to 100% in windows
+Sporadic loss of connection of RT.UI to logger possible
+Climate operation h_std with fluid R600a is not always correct
+Initial IP addresses of the logger are 192.168.234.1 for ETH, 192.168.232.1 for X-LINK, 192.168.236.1 for PC, 192.168.237.1 for WLAN
+Video in online view of RT.UI might flicker
+IPElog2: Downgrading of FPGA V02.03.09 is not possible with HW version 3.90.
+
+2021 R1.1
+FixedBug:   LANTRONIK update inactive in firmware update container
+FixedBug:   LTE modem with vodafone SIM does not work properly (case 62616, 62772, 62859, 63052)
+FixedBug:   UDS request delay between services corrected (case 62469)
+
+2021 R1
+External storage and additional categories: Partition-labels must be unique and must not be named ‘STICK’ and external data-drives must not be bootable. Configuring a start value 0 for the partition-mount-event-signals does not make sense and leads to problems during post-processing (the corresponding partition will be unmounted at start of measurement). Currently supported filesystems: FAT32.
+Status signal for internet connection
+Event signal for triggering data transfer
+TECMP support
+XCP calibration with arrays
+Second tester for XCPonETH
+Diagnostic log and trace
+UDS extensions
+Statistic group
+XCP EPK check via GET_ID
+Motion format in MDF4 native
+LIN master for IPElog2
+Gyro of IPElog2
+On change storage for event channels
+Only traffic with index in MDF4 native
+Formatted channel values in limit messages
+Storage group comment in MDF4 native
+Support of option 'Use display names' for IPEmotion ME
+Additional IP address for RT.UI usage
+User log messages in output window
+Always online
+FixedBug:   IPElog2: Please do not unscrew the antenna during operation.
+FixedBug:   Second Tester Detection only supported when Second Tester is in Measuring Mode (case 61811)
+
+Known restrictions:
+Skipping a major or minor version when downgrading could lead to a malfunction because some firmware is not included in the old setup containers, or some required modifications are not made. Avoid downgrading from IPEmotionRT 2020 R2 to IPEmotionRT 2019 Rx without downgrading to IPEmotionRT 2020 R1 in between. Avoid downgrading from IPEmotionRT 2020 R3 to IPEmotionRT 2020 R1 without downgrading to IPEmotionRT 2020 R2 in between. If the datalogger is not detectable any more after the downgrade, please upgrade the firmware with an USB pen. Export the Image to the USB pen and connect the pen to the USB port of the datalogger. The Yellow LED will stop blinking after the installation. Then downgrade to the desired version. Example 1: IPEmotionRT 2020 R2 -> IPEmotionRT 2020 R1 -> IPEmotinRT 2019 Rxx; Example 2: IPEmotionRT 2020 R3 -> IPEmotionRT 2020 R2 -> IPEmotionRT 2020 R1; Example 3: IPEmotionRT 2021 Rx -> IPEmotionRT 2020 R2 -> IPEmotionRT 2020 R1 -> IPEmotinRT 2019 Rxx;
+HTML5 app at M-LOG V3 with COMgateV3 via 192.168.236.1.
+Mobile display works not correct on Win8.1 or later when display scaling is not set to 100% in windows.
+CM-100 needs to be run with deactivated options 'Logger ready' and '802.1AS Master Detected' or firmware vesion 16 has to be used.
+Sporadic loss of connection of RT.UI to logger possible.
+Climate operation h_std with fluid R600a is not always correct.
+Initial IP addresses of the logger are 192.168.234.1 for ETH, 192.168.232.1 for X-LINK, 192.168.236.1 for PC, 192.168.237.1 for WLAN.
+Video in online view of RT.UI might flicker.
+Trigger signal for DriveView button is not working.
+Limited functionality for Quickstart/NML depening on bus load (CAN / CAN FD).
+Second tester may not be detected on XCPonETH with XETK ECU.
+Second tester in combination with CANape may not be detected on XCPonCAN.
+ARCOS 1.5: A CAN timeout may occur under certain conditions.
+ETHOS: Bench tests completed successfully, vehicle integration tests pending.
+
+2020 R3.3
+FixedBug:   	Missing pre trigger part of video in MDF4
+FixedBug-unverified:	Second tester detection (case 61811)
+
+Known restrictions:
+Skipping a major or minor version when downgrading could lead to a malfunction because some firmware is not included in the old setup containers, or some required modifications are not made. Avoid downgrading from IPEmotionRT 2020 R2 to IPEmotionRT 2019 Rx without downgrading to IPEmotionRT 2020 R1 in between. Avoid downgrading from IPEmotionRT 2020 R3 to IPEmotionRT 2020 R1 without downgrading to IPEmotionRT 2020 R2 in between. If the datalogger is not detectable any more after the downgrade, please upgrade the firmware with an USB pen. Export the Image to the USB pen and connect the pen to the USB port of the datalogger. The Yellow LED will stop blinking after the installation. Then downgrade to the desired version. Example 1: IPEmotionRT 2020 R2 -> IPEmotionRT 2020 R1 -> IPEmotinRT 2019 Rxx; Example 2: IPEmotionRT 2020 R3 -> IPEmotionRT 2020 R2 -> IPEmotionRT 2020 R1; Example 3: IPEmotionRT 2021 Rx -> IPEmotionRT 2020 R2 -> IPEmotionRT 2020 R1 -> IPEmotinRT 2019 Rxx;
+HTML5 app at M-LOG V3 with COMgateV3 via 192.168.236.1
+Mobile display works not correct on Win8.1 or later when display scaling is not set to 100% in windows
+Sporadic loss of connection of RT.UI to logger possible
+Climate operation h_std with fluid R600a is not always correct
+Initial IP addresses of the logger are 192.168.234.1 for ETH, 192.168.232.1 for X-LINK, 192.168.236.1 for PC, 192.168.237.1 for WLAN
+Video in online view of RT.UI might flicker
+
+2020 R3.2
+FixedBug:   'TotalStopTime' in file prefix (case 61105)
+FixedBug:   GPS signal sample rates of IPElog2
+FixedBug:   Wrong error messages at second tester detection (case 60825)
+FixedBug:   Correction for using standard license in RT.UI (case 60974)
+FixedBug-unverified:   DAQ list handling at unnormal operation (e.g. missing disconnect) adapted (case 57457)
+FixedBug-unverified:   Logger with active WakeOnCAN might wake up vehicle at shutdown
+FixedBug-unverified:   Second tester detection
+FixedBug-unverified:   GPS signal generation handling of invalid GPS frames (case 61261)
+FixedBug-unverified:   IEV handling at FTP transfer (case 60847)
+FixedBug-unverified:   Missing pre trigger part of video in MDF4
+
+Known restrictions:
+Skipping a major or minor version when downgrading could lead to a malfunction because some firmware is not included in the old setup containers, or some required modifications are not made. Avoid downgrading from IPEmotionRT 2020 R2 to IPEmotionRT 2019 Rx without downgrading to IPEmotionRT 2020 R1 in between. Avoid downgrading from IPEmotionRT 2020 R3 to IPEmotionRT 2020 R1 without downgrading to IPEmotionRT 2020 R2 in between. If the datalogger is not detectable any more after the downgrade, please upgrade the firmware with an USB pen. Export the Image to the USB pen and connect the pen to the USB port of the datalogger. The Yellow LED will stop blinking after the installation. Then downgrade to the desired version. Example 1: IPEmotionRT 2020 R2 -> IPEmotionRT 2020 R1 -> IPEmotinRT 2019 Rxx; Example 2: IPEmotionRT 2020 R3 -> IPEmotionRT 2020 R2 -> IPEmotionRT 2020 R1; Example 3: IPEmotionRT 2021 Rx -> IPEmotionRT 2020 R2 -> IPEmotionRT 2020 R1 -> IPEmotinRT 2019 Rxx;
+HTML5 app at M-LOG V3 with COMgateV3 via 192.168.236.1
+Mobile display works not correct on Win8.1 or later when display scaling is not set to 100% in windows
+Sporadic loss of connection of RT.UI to logger possible
+Climate operation h_std with fluid R600a is not always correct
+Initial IP addresses of the logger are 192.168.234.1 for ETH, 192.168.232.1 for X-LINK, 192.168.236.1 for PC, 192.168.237.1 for WLAN
+Video in online view of RT.UI might flicker
+
+2020 R3.1
+FixedBug:   Traffic of PLP ETHs is empty, ause traffic of logger ETH actually (case 57892)
+
+Known restrictions:
+Skipping a major or minor version when downgrading could lead to a malfunction because some firmware is not included in the old setup containers, or some required modifications are not made. Avoid downgrading from IPEmotionRT 2020 R2 to IPEmotionRT 2019 Rx without downgrading to IPEmotionRT 2020 R1 in between. Avoid downgrading from IPEmotionRT 2020 R3 to IPEmotionRT 2020 R1 without downgrading to IPEmotionRT 2020 R2 in between. If the datalogger is not detectable any more after the downgrade, please upgrade the firmware with an USB pen. Export the Image to the USB pen and connect the pen to the USB port of the datalogger. The Yellow LED will stop blinking after the installation. Then downgrade to the desired version. Example 1: IPEmotionRT 2020 R2 -> IPEmotionRT 2020 R1 -> IPEmotinRT 2019 Rxx; Example 2: IPEmotionRT 2020 R3 -> IPEmotionRT 2020 R2 -> IPEmotionRT 2020 R1; Example 3: IPEmotionRT 2021 Rx -> IPEmotionRT 2020 R2 -> IPEmotionRT 2020 R1 -> IPEmotinRT 2019 Rxx;
+HTML5 app at M-LOG V3 with COMgateV3 via 192.168.236.1
+Mobile display works not correct on Win8.1 or later when display scaling is not set to 100% in windows
+Sporadic loss of connection of RT.UI to logger possible
+Climate operation h_std with fluid R600a is not always correct
+Initial IP addresses of the logger are 192.168.234.1 for ETH, 192.168.232.1 for X-LINK, 192.168.236.1 for PC, 192.168.237.1 for WLAN
+Video in online view of RT.UI might flicker
+
+2020 R3
+Split event for splitting measuements
+TLS for Emails
+IPElog 03 and 004 templates added
+Up to 20 Hz for GPS of IPELog2
+Satellites on X-LINK interfaces of IPElog 03 and 004
+Internal signal for next mea number
+Access restriction for USB stick
+Additional current signal for IPElog2 03 and 004
+IPEmotionCmd.xml for USB stick
+Re-init tries can be configured for XCP/CCP/OBD-II
+OBD-II mode 4 (clear fault codes)
+ODT optimization for XCP
+Mail receipients can be defined via project parameter
+Only update satellites when firmware differs
+Logger initialization from RT.UI only if necessary
+FTP for firmware updates of DriveView
+MODBUS RTU serial
+Internet routing can be activated to download data from the internet via modem connection
+Index of channels in mail groups can be adapted to change the order
+FixedBug:   ETHOS M-CAN to be used with CANdb as detection and initialization of M devices is not supported on CAN 28 yet
+FixedBug:   Possible time drift of X devices to other devices in comparison to other signals
+
+Known restrictions:
+Skipping a major or minor version when downgrading could lead to a malfunction because some firmware is not included in the old setup containers, or some required modifications are not made. Avoid downgrading from IPEmotionRT 2020 R2 to IPEmotionRT 2019 Rx without downgrading to IPEmotionRT 2020 R1 in between. Avoid downgrading from IPEmotionRT 2020 R3 to IPEmotionRT 2020 R1 without downgrading to IPEmotionRT 2020 R2 in between. If the datalogger is not detectable any more after the downgrade, please upgrade the firmware with an USB pen. Export the Image to the USB pen and connect the pen to the USB port of the datalogger. The Yellow LED will stop blinking after the installation. Then downgrade to the desired version. Example 1: IPEmotionRT 2020 R2 -> IPEmotionRT 2020 R1 -> IPEmotinRT 2019 Rxx; Example 2: IPEmotionRT 2020 R3 -> IPEmotionRT 2020 R2 -> IPEmotionRT 2020 R1; Example 3: IPEmotionRT 2021 Rx -> IPEmotionRT 2020 R2 -> IPEmotionRT 2020 R1 -> IPEmotinRT 2019 Rxx;
+HTML5 app at M-LOG V3 with COMgateV3 via 192.168.236.1
+Mobile display works not correct on Win8.1 or later when display scaling is not set to 100% in windows
+Sporadic loss of connection of RT.UI to logger possible
+Traffic of PLP ETHs is empty, ause traffic of logger ETH actually
+Climate operation h_std with fluid R600a is not always correct
+Initial IP addresses of the logger are 192.168.234.1 for ETH, 192.168.232.1 for X-LINK, 192.168.236.1 for PC, 192.168.237.1 for WLAN
+Video in online view of RT.UI might flicker
+
+2020 R2.4
+FixedBug:   Possible watchdog occurance during runtime removed
+FixedBug:   Optional command GET_DAQ_PROCESSOR_INFO of XCP slave corrected
+
+Known restrictions:
+HTML5 app at M-LOG V3 with COMgateV3 via 192.168.236.1
+Mobile display works not correct on Win8.1 or later when display scaling is not set to 100% in windows
+Climate operation h_std with fluid R600a is not always correct
+Initial IP addresses of the logger are 192.168.234.1 for ETH, 192.168.232.1 for X-LINK, 192.168.236.1 for PC, 192.168.237.1 for WLAN
+Video in online view of RT.UI might flicker
+
+2020 R2.3
+FixedBug:   Tester present correction (case 57538)
+
+Known restrictions:
+HTML5 app at M-LOG V3 with COMgateV3 via 192.168.236.1
+Mobile display works not correct on Win8.1 or later when display scaling is not set to 100% in windows
+Climate operation h_std with fluid R600a is not always correct
+Initial IP addresses of the logger are 192.168.234.1 for ETH, 192.168.232.1 for X-LINK, 192.168.236.1 for PC, 192.168.237.1 for WLAN
+Video in online view of RT.UI might flicker
+
+2020 R2.2
+FixedBug:   XCPonETH timestamp handling (case 57038)
+FixedBug:   MDF4 group mode adaption (case 56754)
+FixedBug:   Correct handling of inactive channels in XCP slave (case 57263)
+
+Known restrictions:
+HTML5 app at M-LOG V3 with COMgateV3 via 192.168.236.1
+Mobile display works not correct on Win8.1 or later when display scaling is not set to 100% in windows
+Climate operation h_std with fluid R600a is not always correct
+Initial IP addresses of the logger are 192.168.234.1 for ETH, 192.168.232.1 for X-LINK, 192.168.236.1 for PC, 192.168.237.1 for WLAN
+Video in online view of RT.UI might flicker
+
+2020 R2.1
+FixedBug:   Only one J1939 instance can actually be used (case 56420)
+FixedBug:   ADIO of µCROS SL might cause problems (case 56797)
+
+Known restrictions:
+HTML5 app at M-LOG V3 with COMgateV3 via 192.168.236.1
+Mobile display works not correct on Win8.1 or later when display scaling is not set to 100% in windows
+Climate operation h_std with fluid R600a is not always correct
+Initial IP addresses of the logger are 192.168.234.1 for ETH, 192.168.232.1 for X-LINK, 192.168.236.1 for PC, 192.168.237.1 for WLAN
+Video in online view of RT.UI might flicker
+
+2020 R2
+ETHOS
+Include check disk in parallel post processing
+Technica PLP devices
+NML for µCROS SL
+Support for DriveView
+J1939 on request signals including bus scan
+J1939 diagnostics messages
+Extended XCP process status
+Byte and text signals for positive responses of UDS from idf
+ECU firmware sync: Store last used iev permanently
+Support for mutiplexed signals with more than one multiplexer value
+Cyclic storage of event channels in MDF4 grouped format
+Oversampled storage for cyclic channels in MDF4 grouped format
+Output channels for formulas
+Run script after storage group is ready
+Upload  mea subset by using IPEmotionRTcmd.xml
+Display satellite firmware versions in RT.UI
+Modbus TCP
+X-ETK
+FixedBug:   Handling of coyping data to USB stabilized (case 52244)
+
+2020 R1.2
+FixedBug:   Reference no more included for duplicate signal names in MDF4 formats (case 55707)
+FixedBug:   Handling of coyping data to USB stabilized (case 52244)
+FixedBug:   Possible time drift of X devices to other devices in comparison to other signals
+FixedBug:   TESTBIT shows no value for bit 0 (case 55477)
+
+2020 R1.1
+FixedBug:   Sometimes the config file was not included in mea also this was configured (case 53641)
+FixedBug:   Use project parameter keys instead of values (case 53506)
+
+Known restrictions:
+The FTP Datatransfer may fail if a session timeout is configured on server side. Please switch to SFTP in such cases or disable the session timeout.
+HTML5 app at M-LOG V3 with COMgateV3 via 192.168.236.1
+Mobile display works not correct on Win8.1 or later when display scaling is not set to 100% in windows
+Climate operation h_std with fluid R600a is not always correct
+Initial IP addresses of the logger are 192.168.234.1 for ETH, 192.168.232.1 for X-LINK, 192.168.236.1 for PC, 192.168.237.1 for WLAN
+Video in online view of RT.UI might flicker
+
+2020 R1
+J1939 update (new stack, event controlled, J1393 standard dbc, bus scan, DTC channel, DTC instrument)
+ZIPRT import of audio remarks created with the mobile app by the customer
+CAN FD for M-LOG V3
+Automatic logger license update for customers with maintenance contract
+Firmware update of satellites
+UDS diagnostics via pdx
+IPElog2 (10 CAN FD 6 LIN)
+Seed & Key via dll (dli)
+MDF4: Optional grouping for cyclic channels with same sample rate
+Timezone configuration
+WoC with µCROS SL
+Climate operations
+WPA2-EP-PEAP-MSCHAPV2
+Configuration of mail groups in acquisition
+ETH plugin: AK protocol
+Output functionality for ETH traffic to send ETH frames
+Slot id range filter for FlexRay traffic
+GPS of µCROS SL up to 10 Hz
+Mobile display configuration can be stored in own file
+Support for developer edition in RT.UI
+FixedBug:   Corrupted configuration if a CAN device's description text contains a multibyte characeter that only partly fits into the devices storage (and thus being trimmed incompletely). (case 52607)
+FixedBug:   Subconfigs in 'AdditionalFiles' folder are currently not supported.
+FixedBug:   CCP firmware sync corrected
+FixedBug:   USB cameras: when using more than one USB camera please contact IPETRONIK support to get infos about USB camera white list
+
+Known restrictions:
+The FTP Datatransfer may fail if a session timeout is configured on server side. Please switch to SFTP in such cases or disable the session timeout.
+Possible time drift of X devices to other devices in comparison to other signals
+HTML5 app at M-LOG V3 with COMgateV3 via 192.168.236.1
+Mobile display works not correct on Win8.1 or later when display scaling is not set to 100% in windows
+Climate operation h_std with fluid R600a is not always correct
+Initial IP addresses of the logger are 192.168.234.1 for ETH, 192.168.232.1 for X-LINK, 192.168.236.1 for PC, 192.168.237.1 for WLAN
+Video in online view of RT.UI might flicker
+
+2019 R3.2
+FixedBug:   New FPGA version for IPElog2 (case 52848)
+FixedBug:   SECOND, MINUTE, HOUR correction concerning NoValues (case 53144)
+
+Known restrictions:
+The FTP Datatransfer may fail if a session timeout is configured on server side. Please switch to SFTP in such cases or disable the session timeout.
+HTML5 app at M-LOG V3 with COMgateV3 via 192.168.236.1
+Mobile display works not correct on Win8.1 or later when display scaling is not set to 100% in windows
+Climate operation h_std with fluid R600a is not always correct
+Initial IP addresses of the logger are 192.168.234.1 for ETH, 192.168.232.1 for X-LINK, 192.168.236.1 for PC, 192.168.237.1 for WLAN
+Video in online view of RT.UI might flicker
+
+2019 R3.1
+FixedBug:   The FTP Datatransfer may fail if a session timeout is configured on server side. Please switch to SFTP in such cases or disable the session timeout.
+FixedBug:   No online data in RT.UI for signals from sub-configs
+
+Known restrictions:
+HTML5 app at M-LOG V3 with COMgateV3 via 192.168.236.1
+Mobile display works not correct on Win8.1 or later when display scaling is not set to 100% in windows
+Initial IP addresses of the logger are 192.168.234.1 for ETH, 192.168.232.1 for X-LINK, 192.168.236.1 for PC, 192.168.237.1 for WLAN
+
+2019 R3
+Signal measurement in NML and wake up on bus data
+CAN send
+Support for LTE modem
+FTP transfer with ending '.part' during transfer
+Switch of full post processing
+Parameters for storage behaviour
+Picture data in MDF4
+FlexRay traffic in MDF4
+ETH traffic in MDF4
+MDF4 with conversion block for multipoint scaling and VTABs
+Dash board in IPEmotion ME and in web interface
+WiFi access point can be deactivated
+FixedBug:   IPEmotionME actually not working in combination with IPEwifiV3
+FixedBug:   Firmware update of X- and CAN-devices may report an update as unnecessary
+FixedBug:   M module firmware update does not work with manually created devices
+
+Known restrictions:
+The FTP Datatransfer may fail if a session timeout is configured on server side. Please switch to SFTP in such cases or disable the session timeout.
+Subconfigs in 'AdditionalFiles' folder are currently not supported.
+HTML5 app at M-LOG V3 with COMgateV3 via 192.168.236.1
+Mobile display works not correct on Win8.1 or later when display scaling is not set to 100% in windows
+Initial IP addresses of the logger are 192.168.234.1 for ETH, 192.168.232.1 for X-LINK, 192.168.236.1 for PC, 192.168.237.1 for WLAN
+
+2019 R2.2
+Firmware update of satellites
+FixedBug:   XCP characterists: Inactive channels (case 51428)
+FixedBug:   E 0x00000463 Storage: A file split was triggered due to a buffer overrun (case 51367)
+
+Known restrictions:
+The FTP Datatransfer may fail if a session timeout is configured on server side. Please switch to SFTP in such cases or disable the session timeout.
+HTML5 app at M-LOG V3 with COMgateV3 via 192.168.236.1
+Mobile display works not correct on Win8.1 or later when display scaling is not set to 100% in windows
+Initial IP addresses of the logger are 192.168.234.1 for ETH, 192.168.232.1 for X-LINK, 192.168.236.1 for PC, 192.168.237.1 for WLAN
+
+2019 R2.1
+FixedBug:   X-Devices are sometimes not working after synchronisation if the PC has an active network interface with the same IP address range as the X devices.
+FixedBug:   NML with power bad might cause problems (case 48201)
+FixedBug:   Modem signal quality is not displayed correctly on µCROS SL
+FixedBug:   iMic audio recording might not work if IPE CAM 003 is connected
+FixedBug:   IPETRONIK CAN devices can not be detected on µCROS SL at startup
+FixedBug:   Only one traffic channel can be used in a MDF4 storage group (case 49280)
+FixedBug:   Firmware update of X- and CAN-devices may report an update as unnecessary
+FixedBug:   Image update via WiFi might report error although it worked
+
+Known restrictions:
+IPEmotionME actually not working in combination with IPEwifiV3
+HTML5 app at M-LOG V3 with COMgateV3 via 192.168.236.1
+Mobile display works not correct on Win8.1 or later when display scaling is not set to 100% in windows
+Initial IP addresses of the logger are 192.168.234.1 for ETH, 192.168.232.1 for X-LINK, 192.168.236.1 for PC, 192.168.237.1 for WLAN
+M module firmware update does not work with manually created devices
+
+2019 R2
+Main configuration and sub configurations
+Firmware update of IPETRONIK X and CAN devices
+µCROS SL
+Using logger in RT.UI via WiFi (Logger access point)
+MDF4: Traffic channels for CAN and CAN FD
+Trigger for XCP polling lists
+Trigger for OBD-II
+FlexRay PDU measurement
+Support of FlexRay signals with multiple cycle definitions
+Default names of bus status signals begin with connector name
+ECU firmware sync with zipped format
+Fault tolerant CANs for CANs of IPElog2
+IPElog2 termination CAN 1 setable
+User messages in IPEmotionME
+Project parameter in IPEmotionME
+Special template for Axis IP cameras
+FixedBug:   WiFi infrastructure mode did not always work correctly (case 47461)
+
+Known restrictions:
+IPEmotionME actually not working in combination with IPEwifiV3
+NML with power bad might cause problems
+iMic audio recording might not work if IPE CAM 003 is connected
+HTML5 app at M-LOG V3 with COMgateV3 via 192.168.236.1
+Mobile display works not correct on Win8.1 or later when display scaling is not set to 100% in windows
+Initial IP addresses of the logger are 192.168.234.1 for ETH, 192.168.232.1 for X-LINK, 192.168.236.1 for PC, 192.168.237.1 for WLAN
+IPETRONIK CAN devices can not be detected on µCROS SL at startup
+Only one traffic channel can be used in a MDF4 storage group
+Firmware update of X- and CAN-devices may report an update as unnecessary
+M module firmware update does not work with manually created devices
+Image update via WiFi might report error although it worked
+Multiple sub configurations might cause problems
+
+2019 R1.3
+FixedBug:   Freeze due to SNTP time update during acquisition (case 48559)
+
+Known restrictions:
+IPEmotionME actually not working in combination with IPEwifiV3
+HTML5 app at M-LOG V3 with COMgateV3 via 192.168.236.1
+IPElog2 WiFi requires WPA2
+Initial IP addresses of the logger are 192.168.234.1 for ETH, 192.168.232.1 for X-LINK, 192.168.236.1 for PC, 192.168.237.1 for WLAN
+Access point can only be used with IPEmotion ME and browser (no gateway mode with WLAN)
+
+2019 R1.2
+FixedBug:   Fixed incorrect encoding of measurement files
+FixedBug:   Correction for firmware update of IPElog2-10-6
+FixedBug:   Transmit acknowledge of CAN messages on CAN FD (case 47560)
+
+Known restrictions:
+The image update can take up to 20 minutes, please always wait for finish
+IPEmotionME actually not working in combination with IPEwifiV3
+HTML5 app at M-LOG V3 with COMgateV3 via 192.168.236.1
+IPElog2 WiFi requires WPA2
+Initial IP addresses of the logger are 192.168.234.1 for ETH, 192.168.232.1 for X-LINK, 192.168.236.1 for PC, 192.168.237.1 for WLAN
+Access point can only be used with IPEmotion ME and browser (no gateway mode with WLAN)
+
+2019 R1.1
+IPElog2-003
+Limits and ranges in IPEmotionME
+FixedBug:   After changing the parameter setting / operation mode beteen internal and external time synchronisation, the devices MUST be POWERED OFF and ON again. Not repowering the deivce(s) will lead to data loss.
+FixedBug:   E mail sending at moire than one configured medium not always possible
+
+Known restrictions:
+In certain circumstances the logger with configured NML does not wake up 
+The image update can take up to 20 minutes, please always wait for finish
+IPEmotionME actually not working in combination with IPEwifiV3
+HTML5 app at M-LOG V3 with COMgateV3 via 192.168.236.1
+IPElog2 WiFi requires WPA2
+Initial IP addresses of the logger are 192.168.234.1 for ETH, 192.168.232.1 for X-LINK, 192.168.236.1 for PC, 192.168.237.1 for WLAN
+Access point can only be used with IPEmotion ME and browser (no gateway mode with WLAN)
+
+2019 R1
+IPElog2 with CAN FD
+IPElog2 with new CPU and extended RAM
+CAN FD PDUs
+Traffic with index
+PC ETH interface of IPEog2 for measurement
+MDF4 project parameter
+Control package as licensed module
+IPEwifiV3 for communication
+Status signal for IPElog2 Wifi connection status
+FTP server upload/download per FTP server
+Deleting or keeping FTP download data
+Extended data transfer
+Automatically restart measurement at low disk space
+VTAB for IPEmotionME
+Limits and ranges in IPEmotionME
+iot-core support
+MQTT up to 10 Hz
+Additional python functionality
+
+Known restrictions:
+The image update can take up to 20 minutes, please always wait for finish
+IPEmotionME actually not working in combination with IPEwifiV3
+HTML5 app at M-LOG V3 with COMgateV3 via 192.168.236.1
+CAN-Tunneling does not reconnect after power loss of tunneling devices
+IPElog2 WiFi requires WPA2
+LAN data transfer requires DHCP
+E mail sending at more than one configured medium not always possible
+Initial IP addresses of the logger are 192.168.234.1 for ETH, 192.168.232.1 for X-LINK, 192.168.236.1 for PC, 192.168.237.1 for WLAN
+Access point can only be used with IPEmotion ME and browser (no gateway mode with WLAN)
+
+2018 R3
+
+No message lost
+Bus activity
+XCPonFlexRay
+ECU synchronisation
+WWH-OBD	
+UDSonCAN signal acquisition
+PDU signal measurement
+Direct storage in MDF4
+Sending and measuring bus signals on the same bus interface	
+PTP-Master for X device syncronisation
+PlugIn options configureable
+'FilePrefix' project property for defining prefix of ziprt files and log files
+Default status signal for the raw data partition
+Cancel for import of measurement files	
+Mailbox for E mails
+Send categories
+Text channel support in IPEmotion ME
+Video signals in IPEmotion ME via WiFi
+Outputs with output level 3 not setable in the app
+Default device for mobile display view
+Send mail by script
+Auto generate with detection of connected hardware
+License dialog for RT logger licenses	
+WLAN refacturing
+FixedBug:   M LOG V3: Wifi and Modem configuration only with COMgateV3
+
+Known restrictions:
+HTML5 app at M-LOG V3 with COMgateV3 via 192.168.236.1
+USB cameras: when using more than one USB camera please contact IPETRONIK support to get infos about USB camera white list
+IP addresses of the logger are actually fixed: 192.168.234.1 for ETH, 192.168.232.1 for X-LINK, 192.168.236.1 for PC, 192.168.237.1 for WLAN
+Access point can only be used with IPEmotion ME and browser (no gateway mode with WLAN)
+
+2018 R2
+Consistent RT update
+WakeOnBus (CAN, LIN)
+Persistancy for formulas, classifications and variables
+XCPonCAN FD
+CAN FD and Flexray satellites
+XCP packed mode (XCP 1.4)
+CCP/XCP: Status and trigger signal
+CAN-Status signals
+CCP/XCPonCAN: Second tester
+Access point and IOT configuration
+CCP/XCP event controlled signals
+Status signals for WiFi and Modem quality of IPElog2
+Logger events for stop/start masurement and for shutdown
+Configureable display size for IPEmotionAPP
+SOME/IP
+FixedBug:   Pretrigger duration might be shorter than configured
+FixedBug:   CANdb export for IPETRONIK CAN might fail
+FixedBug:   Long time delay for audio signals
+FixedBug:   Import measurement files does not import splitted archives
+FixedBug:   DIN DOUT signals need the index in the name
+FixedBug:   GPS fast mode supported yet
+
+Known restrictions:
+IPETTROIK CAN only on M-CAN
+HTML5 app at M-LOG V3 with COMgateV3 via 192.168.236.1
+Using more than 1 satellite on one bus might cause problems
+USB cameras: when using more than one USB camera please contact IPETRONIK support to get infos about USB camera white list
+IP addresses of the logger are actually fixed: 192.168.234.1 for ETH, 192.168.232.1 for X-LINK, 192.168.236.1 for PC, 192.168.237.1 for WLAN
+Access point can only be used with IPEmotion ME and browser (no gateway mode with WLAN)
+The deafult MQTT port with TLS is 8883 instead of 1883
+
+2018 R1.1
+KL-15: Power-On, Shutdown
+USB-Stick: Configuration-Update, Image-Update, Data transfer
+Gateway mode
+WLAN data transfer
+WLAN Access-Point
+Modem data transfer
+FTP server
+SMPT (status mail)
+COMgateV3 support
+HTML5-App
+IPETRONIK X
+IPETRONIK CAN
+IPEspeed
+IPElambda
+IPEout
+CAN Traffic
+Manual CAN messages
+CANdb
+CAN Send
+OBD-II
+OBD-II Mode 21
+CCP
+XCPonCAN (DAQ+CAL)
+GM LAN
+GM LAN job based
+LIN Traffic
+Manual LIN messages
+LINdb
+IP Camera
+ETH Traffic
+XCPonUDP (DAQ+CAL)
+XCPonTCP (DAQ+CAL)
+USB Camera
+DIN
+DOUT
+AUDIO recording
+GPS
+Internal signals
+Status signals
+Demo signals
+Formulas including user operations
+Scalings
+Variables
+Storage groups
+Ring buffer storage groups
+Limit values
+Ranges
+FFT
+Classification
+Router
+Traffic generation
+XCP Slave
+
+Known restrictions:
+USB cameras: when using more than one USB camera please contact IPETRONIK support to get infos about USB camera white list
+IP addresses of the logger are actually fixed: 192.168.234.1 for ETH, 192.168.232.1 for X-LINK, 192.168.236.1 for PC, 192.168.237.1 for WLAN
+Pretrigger duration might be shorter than configured
+CANdb export for IPETRONIK CAN might fail
+Long time delay for audio signals
+M LOG V3: Wifi and Modem configuration only with COMgateV3
+Import measurement files does not import splitted archives
+DIN DOUT signals need the index in the name
+GPS fast mode not supported yet
+USB-Stick for Upload/Download-Data has to be labeled 'STICK' and needs to be FAT32 formated
+COMgateV3 does not work with gateway mode
+Access point can only be used with IPEmotion ME and browser (no gateway mode with WLAN)
+
+__________________________________________________________________________________________________________
+
+Appended the list of message IDs and their content in the user log files.
+It is recommended to use the message IDs for parsing and not the content as the content might change.
+Message list:
+ID           Description / Text
+0000000F:    The free measurement space of the RAW partition including the info about the taotal space on RAW / Free measurement space: 3519 / 3534 MB
+00000011:    "Measurement files are existing in the fallback folder
+00000012:    All jobs are finished. There might be more then one, e.g. USB Stick download data and update config etc... / Jobs finished
+00000013:    Logger configuration update / Update complete
+00000014:    Program update complete: %s
+00000015:    USB stick with label 'STICK' for configuration update / image update / data download  connected / USB Stick connected
+00000016:    USB stick with label 'STICK' disconnected / USB Stick disconnected
+00000019:    Copy log file
+0000001A:    Start data transfer
+0000001C:    Start time update
+0000001F:    Time update finished
+00000020:    Data transfer finished
+00000023:    Time update failed
+00000024:    Data transfer failed
+00000026:    Cyclic info about measurement space (only in diagnostics mode) / Measurement space: ...
+00000027:    Cyclic info about estimated left measurement time (only in diagnostics mode) / Time Left: ...
+00000028:    Total disk space of partition with raw data / Total disk space XXXX MB
+0000002F:    generating upload file
+00000035:    ModemManager: PUK is required
+0000003D:    FTP connection established. Using <mode>!lf!with <mode>!lf!- active mode!lf!- passive mode / FTP connection established. Using <mode>
+00000043:    Start Mail
+00000044:    USB stick needs to be unplugged to reboot the logger / Unplug USB Stick to reboot
+00000047:    Mail finished
+00000048:    Mail failed
+0000004C:    USB peripheral mode is activated
+0000004D:    USB peripheral mode is disabled
+000003E9:    IPEmotionRT-Version on the logger / *************** IPEmotionRT XXXX RX.xxxxx**************
+000003EA:    Serial number from the Logger / Serial number: 8XXXXXX
+000003EF:    Hw revision of the logger / Hw revision: XX.YY
+000003F0:    Production date of the logger / Production date: MM/DD/YYYY
+000003F6:    Calibration date of the logger / Calibration date: MM/DD/YYYY
+000003F7:    About new images / New program found: bzImage.fwc
+000003F8:    Try to continue measurement
+000003F9:    Start date time / StartDateTime: XX:XX:XX:000000
+000003FA:    Stop date time / StopDateTime: XX:XX:XX:000000
+000003FB:    Firmware update running
+000003FC:    Time zone / (GMT) Coordinated Universal Time
+000003FD:    Data recording delay: x s
+000003FE:    The firmware update has finished / Firmware update done
+000003FF:    Exception occurred TODO: spelling OCCURRED
+00000401:    Copying and compressing files ... / Copying and compressing files before XXXX
+00000402:    Copying files... / Copying files before XXXX
+00000403:    Files ready... / Files ready before XXXX
+00000404:    USBControl : Rescue configuration found
+00000405:    The current setup might overload the logger type used.
+00000406:    iDDS
+00000407:    The user disabled the data transfer job.
+00000451:    Post processing is running
+0000045A:    The version of the configuration is too new. Please perform an image update
+0000045B:    License missing
+0000045C:    Version too old
+0000045D:    What kind of license is missing:!lf!with <TYPE>:!lf!- Storage groups unlimited!lf!- Protocols!lf!- Communication!lf!- Multimedia!lf!- Comfort Display!lf!- Control!lf!- Bus interface extension!lf!- SKB!lf!- Modbus / License missing: <TYPE>
+0000045E:    FTP: Unable to connect to IP address <IP>. Reported error: <ERR>
+00000460:    Messages from measurement kernel / <MESSAGE>
+00000461:    Messages in limit configuration configured by user / <MESSAGE>
+00000462:    <SEQUENCENAME>: The sequence was stopped due to <REASON> (Step: %u  Loop: %u Time: %lf)!lf!with <REASON>:!lf!- an error!lf!- to the stop trigger condition / <SEQUENCENAME>: The sequence was stopped due to <REASON> (Step: %u  Loop: %u Time: %lf)
+00000463:    Storage: A file split was triggered due to a buffer overrun.
+00000465:    Running in diagnostic mode
+00000466:    License key from the logger / License key: XXXXX-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX-00000-00000
+00000467:    Shutdown reason: <NAME>!lf!- IPEmotionRT!lf!- Remote!lf!- Watchdog!lf!- Power suppply!lf!- Remote2 / Shutdown reason: IPEmotionRT
+00000468:    Run CheckDisk on <DRIVENAME> drive. <MODE>!lf!with <MODE>!lf!- Full mode.!lf!- Parallel mode. / Run CheckDisk on <DRIVENAME> drive. <MODE>
+00000469:    "Finished CheckDisk on <DRIVENAME> drive<RESULT>!lf!with <RESULT>!lf!- : Exit status could not be read.!lf!- : No (recoverable) errors detected.!lf!- : Recoverable errors detected.!lf!- : No access to the file system. / Finished CheckDisk on <DRIVENAME> drive<RESULT>
+0000046A:    Start by remote
+0000046B:    Start by remote2
+0000046C:    Start by WakeOnBus
+0000046D:    Start by NML
+0000046E:    Start by RTC
+0000046F:    Start by SMS
+00000470:    Start by undervoltage
+00000471:    Start by power bad
+00000472:    Logger type / Logger type: IPElog2 XX-X-X (In case of IPElog2)
+00000473:    CommunicationUnit: WLAN connected.
+00000474:    FTP connect to server <URL>!lf!SFTP connect to server <URL>
+00000475:    <FTP> changed to subdirectory: <SUBDIR>!lf!with <FTP>!lf!- FTP!lf!- SFTP / <FTP> changed to subdirectory: <SUBDIR>
+00000476:    Transferring files of measurement number <MEANR>
+00000477:    CheckDisk: <RESULT>!lf!with <RESULT>!lf!- CheckDisk had to truncate.!lf!- CheckDisk had to reclaim.!lf!- Free cluster summary wrong.!lf!- Dirty bit is set. Fs was not properly unmounted and some data may be corrupt.!lf!- Dirty bit is set. Fs was not properly unmounted and some data may be corrupt. Full-chkdsk necessary on Full post processing.!lf!- Large number of bad entries / CheckDisk: <RESULT>
+00000478:    SIM-Card number unlocked with <TEXT>!lf!- SIM card successfully unlocked!lf!- SIM card successfully unlocked (SIM card number): XXXXXXXXXXXXXXXXXXX / ModemManager: <TEXT>
+00000479:    Errors from ModemManager:!lf!with <TEXT>!lf!- Unable to get interface to unlock SIM. Reported error: ...!lf!- ModemManager: No modem with SIM card found!lf!- Can't enable modem. Reported error: ...!lf!- Unable to connect to <APN>. Reported error: ... / ModemManager: <TEXT>
+0000047A:    NetworkManager: Establishing Internet connection...
+0000047B:    NetworkManager: Unable to establish Internet connection
+0000047C:    NetworkManager: Internet connection successfully established
+0000047D:    Error sending email: <ERR>
+0000047E:    <TYPE> successfully sent (Subject: '<SUBJECT>').!lf!With <TYPE>!lf!- Trigger-Email <NR>!lf!- Delayed Email!lf!- Email!lf!- Info-Email / Time update ...
+0000047F:    File mismatch for %s: local and remote file are different
+00000480:    Transfer <FILENAME> failed, retry
+00000481:    Transfer <FILENAME> failed, no retry
+00000482:    Too many transfer errors, stopping data transfer.
+00000483:    Measurement stop
+00000484:    Measurement stop due to a shutdown event
+00000485:    Measurement start / Measurement start XXXX
+00000486:    e. g. File prefix: 167-578_191111_021113_ / File prefix: <VAR>
+00000487:    Configuration name / Configuration file: <NAME>
+00000488:    Remote signal on
+00000489:    Remote signal off
+0000048A:    Time update succeeded.
+0000048B:    Set NML mask: <HEX> / Set NML mask: 0x0002 (if the CAN 02 is meant)
+0000048C:    Set WakeOnBus mask: <HEX> / Set WakeOnBus mask: 0x0002 (if the CAN 02 is meant)
+0000048D:    Power supply / Power good
+0000048E:    Power supply / Power bad
+0000048F:    WLAN Connected and ready to use
+00000490:    WLAN Disconnected
+00000491:    Power supply / Power down
+00000492:    Transferring (<FILENR>/<TOTALFILES>): <FILENAME> ( <BYTES> bytes )
+00000493:    <USER>: Authentication by password failed: <ERROR_MESSAGE>
+00000494:    USB stick needs to be unplugged to restart measurement / Unplug USB Stick to restart measurement
+00000495:    Start of triggered storage groups / <StorageGroupName> Triggered storage started
+00000496:    Datalogger start failed, can't start measurement
+00000497:    Datalogger Init failed, can't start measurement
+00000498:    OBD-II vehicle identification
+00000499:    Not enough space to continue Measurement
+0000049A:    Disk space insufficient for measurement: %d / %d MB free
+0000049B:    PIN not accepted
+0000049C:    Stop of triggered storage groups / <StorageGroupName> Triggered storage stopped
+0000049D:    Restarted/splitted measurement due to disk space below limit
+0000049E:    License does not match
+0000049F:    Downloading (<FILENR>/<TOTALFILES>): <FILENAME> ( <BYTES> bytes )
+000004A0:    OBD-II calibration identification
+000004A1:    Not enough free disk space for copying file: <FILENAME>
+000004A2:    Next WakeOnRTC planned for <DATE> at UTC <TIME> 
+000004A3:    Hard drive: Model: <MODEL> Serial number: <SERIAL_NUMBER>
+000004A4:    Restarting with synced configuration
+000004A5:    Destination disk full : Free Space %s/%s MB. Unplug USB Stick to restart measurement.
+000004A6:    File name with wrong serial number: <FILENAME>
+000004A8:    OBD-II stored trouble code
+000004B0:    OBD-II sporadic trouble code
+000004B8:    <TYPE>: EPK <EcuEpk> match <Epk> of <EcuName> on <ConnectorName>!lf!With <TYPE>!lf!- CCP!lf!- XCP / <TYPE>: EPK <EcuEpk> match <Epk> of <EcuName> on <ConnectorName>
+000004C0:    <TYPE>: EPK <EcuEpk> mismatch <Epk> of <EcuName> on <ConnectorName>!lf!With <TYPE>!lf!- CCP!lf!- XCP / <TYPE>: EPK <EcuEpk> mismatch <Epk> of <EcuName> on <ConnectorName>
+000004C8:    <TYPE> measurement on <NAME>!lf!With <TYPE>!lf!- CAN!lf!- CCP!lf!- XCP / <TYPE> measurement on <NAME>
+000004D0:    Timeout on <NAME>
+000004D8:    Vehicle identification number: <NUMBER>
+000004E0:    System like CAN FD or LIN or FlexRay satellite is not connected / The system is not available.
+000004E1:    Special files like iev files have been deleted from logger / IEV data deleted
+000004E2:    Wrong filesystem or write protected / USB Stick does not fit the requirements for coping data^! Check write protection and filesystem format.
+000004E3:    Special files like iev are not existing on logger when trying to delete them / IEV data not existing
+000004E8:    UDS job not completed: <Count>
+000004F0:    UDS start ECUs failed on <Name>
+000004F8:    Successfully switched to ECU version
+00000500:    <TYPE>: Start ECU failed on '<ConnectorName>'!lf!With <TYPE>!lf!- CCP!lf!- XCP / <TYPE>: Start ECU failed on '<ConnectorName>'
+00000508:    <TYPE> ECU not found on <NAME>!lf!With <TYPE>!lf!- CCP!lf!- XCP / <TYPE> ECU not found on <NAME>
+00000510:    <TYPE>: Second Tester on '<ConnectorName>'!lf!With <TYPE>!lf!- CCP!lf!- XCP / <TYPE>: Second Tester on '<ConnectorName>'
+00000511:    Mail: <ErrorMessage>
+00000512:    Certificate Control: Certificate expired
+00000513:    Certificate Control: Certificate installed successfully: <NAME>
+00000514:    USB Pen: No usb stick handling. Permission denied^!
+00000515:    ModemManager: Modem IMEI number: <IMEI>
+00000516:    ModemManager: SIM IMSI number: <IMSI>
+00000517:    Detected non-recoverable error. Failsafe state, waiting for manual recovery ...
+00000518:    Start of the traffic generator / <TrafficGeneratorName> traffic generator started
+00000519:    Stop of the traffic generator / <TrafficGeneratorName> traffic generator stopped
+0000051A:    Pause of the traffic generator started / <TrafficGeneratorName> traffic generator pause started
+0000051B:    Pause of the traffic generator stopped / <TrafficGeneratorName> traffic generator pause stopped
+0000051C:    Start of triggered storage groups with a defined pretrigger / <StorageGroupName> Triggered storage started. Pretrigger X s
+0000051D:    Stop of triggered storage groups with a defined posttrigger / <StorageGroupName> Triggered storage stopped. Posttrigger X s
+0000051E:    Datalogger start failed, filesystem error detected
+0000051F:    Failed to unmount USB Stick
+00000520:    CheckDisk error: <ERR>!lf!with <ERR>!lf!- No answer from CheckDisk process- CheckDisk not executed.!lf!- CheckDisk stopped by timeout.!lf! Filesystem check failed.!lf!- Remounting drives failed. / CheckDisk error: <ERR>
+00000521:    ModemManager: SIM card number: <Identifier>
+00000522:    Failsafe state entering in <Number> tries
+00000523:    Ignore new split event because the previous one hasn't finished yet 
+00000524:    ModemManager: Access technology <Access technology>
+00000525:    Postprocessing stopped as configured emergency switch off time is reached
+00000528:    Firmware differs from recommended version which will be installed via 'Update devices' function
+00000530:    Status	CPU: [CPU load], Used memory: [Memory], Free disk space (MEA/RAW): [SpaceMEA] [SpaceRAW]
+00000538:    Starting with ECU version
+00000540:    GPS: Data valid/invalid
+00000548:    Job sequence is active
+00000550:    Firmmware update start/stop
+000005F0:    Firmware update failed.
+000005F1:    Infos about aborting the update!lf!- Aborting firmware update ...!lf!Firmware update aborted.!lf!Firmware update abort failed. / Aborting firmware update ...
+000005F2:    EthernetInterface [<InterfaceName>] Detected conflict of IP address (<IP>) with IP address of interface <InterfaceName>
+000005F3:    Conflict concerning IP subnets
+000005F5:    Error messages from unmount process / <MESSAGE>
+000005F6:    Unmounting drive ...!lf!Drive unmounted. / <MESSAGE>
+000005F7:    Unmount of drive aborted due to post-processing.
+000005F8:    Remount of <DIR> failed! Error: <ERRORMESSAGE>!lf!- Can't read mount table for validation^!!lf!- Mount directory not present: <NAME>. Drive not mounted. / <MESSAGE>
+000005F9:    Mounting of <NAME> succeeded.
+000005FA:    Remote timeout
+000005FB:    Startup watchdog timeout
+000005FC:    Runtime watchdog timeout
+0000060B:    Start by power bad
+0000060C:    Start by ethernet (ABK)
+0000060D:    Start due to reboot
+0000060E:    Start due to watchdog
+00000611:    Enable WakeOnSMS
+00000614:    Immediate shutdown request
+0000061B:    Always-Online is <enabled/disabled> for medium <medium name>.
+0000061C:    IP Settigns for Always-Online on Network <network name>.
+0000061D:    Ping to ###.###.###.### failed
+0000061E:    Ping: DNS resolving failed or IP address not valid

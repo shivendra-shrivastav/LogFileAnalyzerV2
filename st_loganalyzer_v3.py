@@ -75,7 +75,18 @@ from llm_handler import LLMHandler
 SYSTEM_PROMPT = """
 You are LogInsightGPT, an assistant specialized in analyzing and summarizing diagnostic and runtime logs from IPETRONIK's IPEmotionRT system (e.g., version 2024 R3.2 or 2025 R2.65794), running on logger types like IPE833 or IPE853.
 
-Your task is to interpret provided internal log files (.LOG) and generate a structured summary following the format exactly as below:
+Your primary directive: STRICTLY use ONLY the provided raw log content (including file boundary markers like '====== FILE:') and any earlier generated summary when answering. Do NOT rely on outside knowledge, assumptions, or undocumented behavior. If information is absent, state clearly: "Information not found in provided logs." Never fabricate values (e.g., versions, measurement IDs, serial numbers, timestamps) that are not explicitly present.
+
+When producing the initial structured summary, follow the format exactly as below. When answering follow-up questions:
+1. Cite supporting evidence by quoting minimal raw log line fragments (or measurement IDs) under a heading "Evidence".
+2. If partial but inconclusive evidence exists, respond with "Insufficient evidence in provided logs" and list what is missing.
+3. For counts, derive them directly from the log lines; do not estimate.
+4. For chronological questions, base ordering only on timestamps present.
+5. If asked about causes or diagnostics not explicitly stated, provide a neutral statement: "The logs do not specify the root cause." and optionally list related error/warning lines.
+6. Never include sensitive speculation or external product details not in the logs.
+7. Prefer concise, structured answers. Avoid repetition.
+
+Refusal policy: If a user asks for data outside the logs (e.g., future features, internal architecture not logged), reply: "Cannot answer: information not contained in the provided logs." Do not apologize unless explicitly asked.
 
 ### 🧾 General Information:
 
@@ -88,36 +99,37 @@ Your task is to interpret provided internal log files (.LOG) and generate a stru
 ### 📌 Important Events:
 
 - **<span style='color:#ff914d'>System start & initialization</span>**  
-  - [List startup events as bullet points]
+    - [List startup events as bullet points]
 
 - **<span style='color:#ff914d'>Memory check & cleanup</span>**  
-  - [List memory check events as bullet points]
+    - [List memory check events as bullet points]
 
 - **<span style='color:#ff914d'>Measurements & data transfer</span>**  
-  - [List measurement events, with numbered measurement IDs and corresponding start times]
-  - Data transfer to IPEcloud (if applicable)
+    - [List measurement events, with numbered measurement IDs and corresponding start times]
+    - Data transfer to IPEcloud (if applicable)
   
 - **<span style='color:#ff914d'>Error messages & warnings</span>**  
-  - **Power**: [timestamp] [Description]
-  - **WLAN**: [timestamp] [Description]
-  - **CAN**: [timestamp] [Description]
-  - **GPS**: [timestamp] [Description]
-  - **Disk**: [timestamp] [Description]
-  - **Protocols**: [timestamp] [Description]
+    - **Power**: [timestamp with milliseconds] [Description]
+    - **WLAN**: [timestamp with milliseconds] [Description]
+    - **CAN**: [timestamp with milliseconds] [Description]
+    - **GPS**: [timestamp with milliseconds] [Description]
+    - **Disk**: [timestamp with milliseconds] [Description]
+    - **Protocols**: [timestamp with milliseconds] [Description]
 
 ### ✅ Conclusion:
 
-Summarize key takeaways using emojis.
+Summarize key takeaways using emojis (only if justified by log evidence).
 
 Notes:
 - Use only the information inside the logs.
 - Maintain professional tone, consistent formatting, and structured section headings.
+- Do not speculate; cite evidence for non-trivial answers.
 """
 
 # Three-tier processing thresholds optimized for performance and cost
 TOKEN_THRESHOLD_FILTERING = 150000      # Switch to Basic processing (with filtering)
 TOKEN_THRESHOLD_TURBO_FILTERING = 500000  # Switch to Turbo processing (aggressive filtering)
-MAX_TOKENS_PER_CHUNK = 35000           # Optimized chunk size for efficient processing
+MAX_TOKENS_PER_CHUNK = 25000           # Safe chunk size within rate limits (30K TPM limit)
 
 # Processing Tier Configuration:
 # Tier 1 - Direct: < 150K tokens (single API call, no filtering)
@@ -343,26 +355,37 @@ def process_logs_smart(
     if progress_callback:
         progress_callback(f"📊 Analyzing {total_tokens:,} tokens...")
     
+    # Cache raw content for follow-up questions (direct or filtered later)
+    # Cache raw content for follow-up questions (direct or filtered later)
+    st.session_state['raw_log_content'] = log_content
+
     # Strategy 0: Metrics-only analysis (only if forced by user)
     if force_metrics_only:
         if progress_callback:
             progress_callback("🔍 Forced metrics-only analysis...")
+        llm_handler.set_processing_method("Metrics-only")
         return process_with_metrics_only(log_content, progress_callback)
     
     # Strategy 1: Direct processing (< 150K tokens)
     elif total_tokens < TOKEN_THRESHOLD_FILTERING:
         if progress_callback:
             progress_callback("🚀 Processing directly...")
+        llm_handler.set_processing_method("Direct")
         
         if total_tokens <= MAX_TOKENS_PER_CHUNK:
-            return llm_handler.generate_summary(log_content, SYSTEM_PROMPT)
+            summary = llm_handler.generate_summary(log_content, SYSTEM_PROMPT)
+            st.session_state['final_processed_content'] = log_content
+            return summary
         else:
-            return process_with_chunking(log_content, llm_handler, progress_callback)
+            processed = process_with_chunking(log_content, llm_handler, progress_callback)
+            st.session_state['final_processed_content'] = log_content
+            return processed
     
     # Strategy 2: Turbo filtered processing (>= 500K tokens)
     elif total_tokens >= TOKEN_THRESHOLD_TURBO_FILTERING:
         if progress_callback:
             progress_callback("🚀 Applying turbo filtering for large files...")
+        llm_handler.set_processing_method("ID-Based Turbo")
         
         # Fast preprocessing: Remove extremely verbose lines first
         if progress_callback:
@@ -394,17 +417,22 @@ def process_logs_smart(
         
         # Process filtered content with LLM
         if filtered_tokens <= MAX_TOKENS_PER_CHUNK:
-            return llm_handler.generate_summary(filtered_content, SYSTEM_PROMPT)
+            summary = llm_handler.generate_summary(filtered_content, SYSTEM_PROMPT)
+            st.session_state['final_processed_content'] = filtered_content
+            return summary
         else:
-            return process_with_chunking(filtered_content, llm_handler, progress_callback)
+            processed = process_with_chunking(filtered_content, llm_handler, progress_callback)
+            st.session_state['final_processed_content'] = filtered_content
+            return processed
     
     # Strategy 3: Basic filtered processing (150K - 500K tokens)
     else:
         if progress_callback:
             progress_callback("🔍 Applying basic filtering...")
+        llm_handler.set_processing_method("Basic Filtered")
         
         # Apply basic filtering (existing filter_log_content function)
-        filtered_content = filter_log_content(log_content, keep_critical=True)
+        filtered_content = filter_log_content(log_content)
         filtered_tokens = count_tokens(filtered_content, llm_handler.model)
         
         if progress_callback:
@@ -415,9 +443,13 @@ def process_logs_smart(
         
         # Process filtered content with LLM
         if filtered_tokens <= MAX_TOKENS_PER_CHUNK:
-            return llm_handler.generate_summary(filtered_content, SYSTEM_PROMPT)
+            summary = llm_handler.generate_summary(filtered_content, SYSTEM_PROMPT)
+            st.session_state['final_processed_content'] = filtered_content
+            return summary
         else:
-            return process_with_chunking(filtered_content, llm_handler, progress_callback)
+            processed = process_with_chunking(filtered_content, llm_handler, progress_callback)
+            st.session_state['final_processed_content'] = filtered_content
+            return processed
 
 
 def fast_preprocess_content(log_content: str) -> str:
@@ -679,22 +711,22 @@ def process_with_chunking(
     if progress_callback:
         progress_callback(f"📦 Split into {len(chunks)} chunks")
     
-    # If we have too many chunks, reduce them by increasing chunk size
+    # If we have too many chunks, reduce them by increasing chunk size (but stay within rate limits)
     if len(chunks) > 8:  # Reduced threshold from 10 to 8
         if progress_callback:
             progress_callback(f"⚡ Optimizing chunk count ({len(chunks)} → target ~6 chunks)...")
-        # Use larger chunks to significantly reduce API calls
-        larger_chunk_size = min(MAX_TOKENS_PER_CHUNK * 1.5, 50000)  # Up to 50K tokens
+        # Use larger chunks but stay within 30K TPM rate limit
+        larger_chunk_size = min(MAX_TOKENS_PER_CHUNK * 1.2, 28000)  # Max 28K to stay under 30K limit
         chunks = chunk_text_by_tokens(content, int(larger_chunk_size), llm_handler.model)
         if progress_callback:
             progress_callback(f"📦 Optimized to {len(chunks)} chunks")
     
-    # For very large files, be even more aggressive
+    # For very large files, don't exceed rate limits
     if len(chunks) > 12:
         if progress_callback:
             progress_callback(f"🚀 Ultra-optimizing for large file ({len(chunks)} chunks)...")
-        # Use maximum safe chunk size
-        ultra_chunk_size = min(MAX_TOKENS_PER_CHUNK * 2, 60000)  # Up to 60K tokens
+        # Use maximum safe chunk size (stay under 30K TPM limit)
+        ultra_chunk_size = min(MAX_TOKENS_PER_CHUNK * 1.15, 28000)  # Max 28K tokens
         chunks = chunk_text_by_tokens(content, int(ultra_chunk_size), llm_handler.model)
         if progress_callback:
             progress_callback(f"📦 Ultra-optimized to {len(chunks)} chunks")
@@ -810,7 +842,7 @@ def format_metrics_summary(metrics) -> str:
     if metrics.power_events:
         summary += f"  - **Power**: Found {len(metrics.power_events)} power-related events\n"
         for event in metrics.power_events[:3]:
-            timestamp_match = re.match(r'(\d{2}\.\d{2}\.\d{4}\s+\d{2}:\d{2}:\d{2})', event)
+            timestamp_match = re.match(r'(\d{2}\.\d{2}\.\d{4}\s+\d{2}:\d{2}:\d{2}(?:\.\d{3,6})?)', event)
             timestamp = timestamp_match.group(1) if timestamp_match else 'Unknown time'
             description = event.split(timestamp)[-1].strip() if timestamp_match else event
             summary += f"    - {timestamp} {description}\n"
@@ -841,7 +873,7 @@ def format_metrics_summary(metrics) -> str:
     if can_events:
         summary += f"  - **CAN**: {len(can_events)} CAN-related issues found\n"
         for event in can_events[:2]:
-            timestamp_match = re.match(r'(\d{2}\.\d{2}\.\d{4}\s+\d{2}:\d{2}:\d{2})', event)
+            timestamp_match = re.match(r'(\d{2}\.\d{2}\.\d{4}\s+\d{2}:\d{2}:\d{2}(?:\.\d{3,6})?)', event)
             timestamp = timestamp_match.group(1) if timestamp_match else 'Unknown time'
             summary += f"    - {timestamp} CAN issue detected\n"
     else:
@@ -873,7 +905,7 @@ def format_metrics_summary(metrics) -> str:
     if metrics.protocol_timeouts:
         summary += f"  - **Protocols**: {len(metrics.protocol_timeouts)} protocol timeouts detected\n"
         for timeout in metrics.protocol_timeouts[:3]:
-            timestamp_match = re.match(r'(\d{2}\.\d{2}\.\d{4}\s+\d{2}:\d{2}:\d{2})', timeout)
+            timestamp_match = re.match(r'(\d{2}\.\d{2}\.\d{4}\s+\d{2}:\d{2}:\d{2}(?:\.\d{3,6})?)', timeout)
             timestamp = timestamp_match.group(1) if timestamp_match else 'Unknown time'
             summary += f"    - {timestamp} Protocol timeout\n"
     else:
@@ -930,11 +962,11 @@ def main():
     - ID-Based Turbo: Large files (> 500K tokens) - Intelligent ID-based filtering + LLM analysis
     
     **Performance Optimizations:**
-    - 35K token chunks (up from 20K) for fewer API calls and faster processing
+    - 25K token chunks (optimized for 30K TPM rate limit) for safe processing
     - ID-based turbo filtering for files over 500,000 tokens with over 95% noise reduction
     - Critical event preservation - All errors, warnings, and measurements kept
     - Ultra-fast preprocessing removes obvious noise in seconds
-    - Adaptive chunking with up to 60K tokens for very large files
+    - Adaptive chunking with up to 28K tokens for very large files (within rate limits)
     - Interactive chat for follow-up questions on all processed files
     - Real-time cost tracking with optimized token usage
     - Optional metrics-only mode for instant, zero-cost analysis
@@ -1038,6 +1070,7 @@ def main():
                     input_cost = cost_breakdown.get('input_cost', 0)
                     output_cost = cost_breakdown.get('output_cost', 0)
                     model_used = cost_breakdown.get('model', 'N/A')
+                    processing_method = cost_breakdown.get('processing_method', 'N/A')
                     
                     st.metric(
                         "💵 Total Cost",
@@ -1048,6 +1081,7 @@ def main():
                     # Cost breakdown
                     with st.expander("💡 Detailed Cost Breakdown"):
                         st.write(f"**Model Used:** {model_used}")
+                        st.write(f"**🎯 Processing Method:** {processing_method}")
                         st.write(f"**Input Cost:** ${input_cost:.4f} ({input_tokens:,} tokens)")
                         st.write(f"**Output Cost:** ${output_cost:.4f} ({output_tokens:,} tokens)")
                         st.write(f"**Total Cost:** ${total_cost:.4f}")

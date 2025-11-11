@@ -28,15 +28,15 @@ from typing import List, Tuple, Dict, Any, Optional
 # Configuration & Constants
 # ===============================
 
-# OpenAI Pricing (USD per 1M tokens) - Updated October 2025
+# OpenAI Pricing (USD per 1M tokens) - Updated November 2025
 PRICING = {
     'gpt-4.1': {
-        'input': 1.50,        # $1.50 per 1M input tokens
-        'output': 6.00        # $6.00 per 1M output tokens
+        'input': 2.00,        # $2.00 per 1M input tokens
+        'output': 8.00        # $8.00 per 1M output tokens
     },
     'gpt-5': {
-        'input': 5.00,        # $5.00 per 1M input tokens
-        'output': 15.00       # $15.00 per 1M output tokens
+        'input': 1.25,        # $1.25 per 1M input tokens
+        'output': 10.00       # $10.00 per 1M output tokens
     }
 }
 
@@ -114,6 +114,8 @@ class LogMetrics:
             'memory': [], 
             'disk_space': []
         }
+        # Optional detailed CPU events with timestamps for extrema lookup
+        self.cpu_events: List[Dict[str, Any]] = []
         self.protocol_timeouts: List[str] = []
         self.power_events: List[str] = []
 
@@ -382,18 +384,18 @@ def extract_key_metrics(content: str) -> LogMetrics:
         
         # Extract log period
         if '0x000003F9' in line:  # StartDateTime
-            start_match = re.search(r'(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', line)
+            start_match = re.search(r'(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(?:\.\d{3,6})?)', line)
             if start_match:
                 metrics.log_period['start'] = start_match.group(1)
         
         if '0x000003FA' in line:  # StopDateTime
-            stop_match = re.search(r'(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', line)
+            stop_match = re.search(r'(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(?:\.\d{3,6})?)', line)
             if stop_match:
                 metrics.log_period['end'] = stop_match.group(1)
         
         # Extract measurement events
         if '0x00000485' in line:  # Measurement start
-            timestamp_match = re.search(r'(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', line)
+            timestamp_match = re.search(r'(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(?:\.\d{3,6})?)', line)
             if timestamp_match:
                 metrics.measurements.append({
                     'timestamp': timestamp_match.group(1),
@@ -403,7 +405,7 @@ def extract_key_metrics(content: str) -> LogMetrics:
         
         # Extract WLAN events
         if '0x0000048F' in line:  # WLAN Connected
-            timestamp_match = re.search(r'(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', line)
+            timestamp_match = re.search(r'(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(?:\.\d{3,6})?)', line)
             if timestamp_match:
                 metrics.wlan_events.append({
                     'timestamp': timestamp_match.group(1),
@@ -412,7 +414,7 @@ def extract_key_metrics(content: str) -> LogMetrics:
                 })
         
         if '0x00000490' in line:  # WLAN Disconnected
-            timestamp_match = re.search(r'(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', line)
+            timestamp_match = re.search(r'(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(?:\.\d{3,6})?)', line)
             if timestamp_match:
                 metrics.wlan_events.append({
                     'timestamp': timestamp_match.group(1),
@@ -438,11 +440,41 @@ def extract_key_metrics(content: str) -> LogMetrics:
             warning_code = re.search(r'0x[0-9A-Fa-f]+', line)
             code = warning_code.group(0) if warning_code else 'Unknown'
             metrics.warnings[code].append(line)
+
+        # Extract CPU usage from status or performance lines
+        # Typical patterns may look like:
+        # 2025-11-11 12:34:56.123 Status: CPU: 43% Mem: 62% Disk: 71%
+        # or: 2025-11-11 12:34:56 CPU: 43% Memory: 62%
+        if 'CPU:' in line:
+            cpu_match = re.search(r'CPU:\s*(\d+)%', line)
+            if cpu_match:
+                cpu_val = int(cpu_match.group(1))
+                metrics.status_summary['cpu'].append(cpu_val)
+                # Attempt timestamp capture (YYYY-MM-DD HH:MM:SS(.micro) or DD.MM.YYYY HH:MM:SS(.micro))
+                ts_match = re.search(r'(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(?:\.\d{3,6})?|\d{2}\.\d{2}\.\d{4} \d{2}:\d{2}:\d{2}(?:\.\d{3,6})?)', line)
+                timestamp = ts_match.group(1) if ts_match else None
+                metrics.cpu_events.append({
+                    'timestamp': timestamp,
+                    'cpu': cpu_val,
+                    'raw': line
+                })
+
+        # Extract Memory usage if present
+        if re.search(r'(Mem:|Memory:)', line):
+            mem_match = re.search(r'(?:Mem:|Memory:)\s*(\d+)%', line)
+            if mem_match:
+                metrics.status_summary['memory'].append(int(mem_match.group(1)))
+
+        # Extract Disk space percentage usage if present
+        if 'Disk:' in line:
+            disk_match = re.search(r'Disk:\s*(\d+)%', line)
+            if disk_match:
+                metrics.status_summary['disk_space'].append(int(disk_match.group(1)))
     
     return metrics
 
 
-def calculate_costs(input_tokens: int, output_tokens: int, model: str) -> Dict[str, Any]:
+def calculate_costs(input_tokens: int, output_tokens: int, model: str, processing_method: str = 'Direct') -> Dict[str, Any]:
     """
     Calculate the cost of OpenAI API usage for the specified model and token usage.
     
@@ -454,6 +486,7 @@ def calculate_costs(input_tokens: int, output_tokens: int, model: str) -> Dict[s
         input_tokens (int): Number of tokens sent to the model (prompt + context)
         output_tokens (int): Number of tokens generated by the model (response)
         model (str): OpenAI model name ("gpt-4.1", "gpt-5", etc.)
+        processing_method (str): Processing technique used ("Direct", "Basic Filtered", "ID-Based Turbo")
         
     Returns:
         Dict[str, Any]: Cost breakdown containing:
@@ -463,6 +496,7 @@ def calculate_costs(input_tokens: int, output_tokens: int, model: str) -> Dict[s
             - 'input_tokens': Number of input tokens used
             - 'output_tokens': Number of output tokens generated
             - 'model': Model name used for calculation
+            - 'processing_method': Processing technique that was applied
             
     Pricing Structure (USD per 1M tokens):
         GPT-4.1:
@@ -500,5 +534,6 @@ def calculate_costs(input_tokens: int, output_tokens: int, model: str) -> Dict[s
         'total_cost': total_cost,
         'input_tokens': input_tokens,
         'output_tokens': output_tokens,
-        'model': model
+        'model': model,
+        'processing_method': processing_method
     }

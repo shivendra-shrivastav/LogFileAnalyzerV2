@@ -67,6 +67,7 @@ class LLMHandler:
         self.total_input_tokens = 0
         self.total_output_tokens = 0
         self.api_calls = 0
+        self.processing_method = "Direct"  # Default processing method
     
     def generate_summary(self, content: str, system_prompt: str) -> str:
         """
@@ -300,9 +301,35 @@ Chunk summaries to consolidate:
             - Optimized for technical accuracy and relevance
             - Essential for detailed troubleshooting workflows
         """
+        # Inject relevant raw log snippets (evidence) for improved grounded answers
+        # We look for CPU usage context if the user asks about CPU
+        user_last = next((m['content'] for m in reversed(messages) if m['role'] == 'user'), '')
+        injected_messages = list(messages)
+        if 'cpu' in user_last.lower():
+            try:
+                import streamlit as st
+                raw_content = st.session_state.get('final_processed_content') or st.session_state.get('raw_log_content') or ''
+                evidence_lines = []
+                for line in raw_content.split('\n'):
+                    if 'CPU:' in line:
+                        evidence_lines.append(line.strip())
+                    if len(evidence_lines) >= 40:  # cap evidence to avoid token blow-up
+                        break
+                if evidence_lines:
+                    evidence_block = "\n".join(evidence_lines)
+                    injected_messages.append({
+                        "role": "system",
+                        "content": (
+                            "EVIDENCE: The following raw log lines contain CPU information. Use ONLY these lines for CPU-related answers. "
+                            "If insufficient for the user's exact request, reply with 'Insufficient evidence in provided logs' and list missing specifics.\n" + evidence_block
+                        )
+                    })
+            except Exception:
+                pass
+
         response = self.client.chat.completions.create(
             model=self.model,
-            messages=messages,
+            messages=injected_messages,
             temperature=0.3
         )
         
@@ -312,6 +339,15 @@ Chunk summaries to consolidate:
         self.api_calls += 1
         
         return response.choices[0].message.content
+    
+    def set_processing_method(self, method: str):
+        """
+        Set the processing method being used for cost tracking.
+        
+        Args:
+            method (str): Processing method ("Direct", "Basic Filtered", "ID-Based Turbo", "Metrics-only")
+        """
+        self.processing_method = method
     
     def get_usage_stats(self) -> Dict[str, Any]:
         """
@@ -360,9 +396,9 @@ Chunk summaries to consolidate:
         cost_info = calculate_costs(
             self.total_input_tokens,
             self.total_output_tokens,
-            self.model
+            self.model,
+            self.processing_method
         )
-        
         return {
             'api_calls': self.api_calls,
             'input_tokens': self.total_input_tokens,
