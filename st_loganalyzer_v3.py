@@ -742,6 +742,12 @@ def process_with_chunking(
             chunk, SYSTEM_PROMPT, i+1, len(chunks)
         )
         chunk_summaries.append(summary)
+        
+        # Add delay between chunks to respect TPM rate limit (30K tokens/min)
+        # Wait 3 seconds between chunks to stay under limit
+        if i < len(chunks) - 1:  # Don't wait after last chunk
+            import time
+            time.sleep(3)
     
     # Combine summaries
     if progress_callback:
