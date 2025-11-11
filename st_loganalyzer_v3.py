@@ -39,8 +39,8 @@ Key Features:
     - Professional structured output with IPE-specific formatting
 
 Supported Models:
-    - GPT-4.1 (recommended): $1.50/$6.00 per 1M tokens (input/output)
-    - GPT-5 (premium): $5.00/$15.00 per 1M tokens (input/output)
+    - GPT-4.1 (recommended): $2.00/$8.00 per 1M tokens (input/output)
+    - GPT-5 (premium): $1.25/$10.00 per 1M tokens (input/output)
 
 Author: LogFileAnalyzerV2 Team
 Version: 3.0.0
@@ -1000,12 +1000,12 @@ def main():
             🚀 **GPT-4.1** (Recommended)
             - Fast and efficient
             - Best for routine log analysis
-            - **Pricing**: $1.50 / $6.00 per 1M tokens (input/output)
+            - **Pricing**: $2.00 / $8.00 per 1M tokens (input/output)
             
             🧠 **GPT-5** (Advanced)
             - Most powerful model
             - Best for complex diagnostics
-            - **Pricing**: $5.00 / $15.00 per 1M tokens (input/output)
+            - **Pricing**: $1.25 / $10.00 per 1M tokens (input/output)
             """)
         
         model_option = st.selectbox(
