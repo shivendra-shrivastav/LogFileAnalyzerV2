@@ -20,6 +20,7 @@ Date: October 2025
 
 from typing import List, Dict, Any, Tuple, Optional
 from openai import OpenAI
+import time
 
 
 class LLMHandler:
@@ -69,6 +70,57 @@ class LLMHandler:
         self.api_calls = 0
         self.processing_method = "Direct"  # Default processing method
     
+    def _api_call_with_retry(self, messages: List[Dict[str, str]], max_retries: int = 5):
+        """
+        Make an API call with exponential backoff retry logic for rate limits.
+        
+        Args:
+            messages: List of message dictionaries for the chat completion
+            max_retries: Maximum number of retry attempts (default: 5)
+            
+        Returns:
+            ChatCompletion response object
+            
+        Raises:
+            Exception: If all retries are exhausted
+        """
+        for attempt in range(max_retries):
+            try:
+                response = self.client.chat.completions.create(
+                    model=self.model,
+                    messages=messages,
+                    temperature=0.3
+                )
+                return response
+            except Exception as e:
+                error_message = str(e)
+                # Check if it's a rate limit error
+                if "rate_limit_exceeded" in error_message or "429" in error_message:
+                    if attempt < max_retries - 1:
+                        # Extract wait time from error message if available
+                        wait_time = 2 ** attempt  # Exponential backoff: 1s, 2s, 4s, 8s, 16s
+                        
+                        # Try to parse the recommended wait time from error message
+                        if "Please try again in" in error_message:
+                            try:
+                                import re
+                                match = re.search(r'try again in ([\d.]+)s', error_message)
+                                if match:
+                                    wait_time = float(match.group(1)) + 1  # Add 1 second buffer
+                            except:
+                                pass
+                        
+                        print(f"Rate limit hit. Waiting {wait_time:.1f}s before retry {attempt + 1}/{max_retries}...")
+                        time.sleep(wait_time)
+                        continue
+                    else:
+                        raise Exception(f"Rate limit exceeded after {max_retries} retries: {error_message}")
+                else:
+                    # Non-rate-limit error, raise immediately
+                    raise
+        
+        raise Exception(f"API call failed after {max_retries} attempts")
+    
     def generate_summary(self, content: str, system_prompt: str) -> str:
         """
         Generate a comprehensive summary for log content in a single API call.
@@ -97,14 +149,12 @@ class LLMHandler:
             - Optimized temperature (0.3) for consistent, factual output
             - Ideal for Direct processing tier (<150K tokens)
         """
-        response = self.client.chat.completions.create(
-            model=self.model,
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": content}
-            ],
-            temperature=0.3  # Low temperature for consistent, factual analysis
-        )
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": content}
+        ]
+        
+        response = self._api_call_with_retry(messages)
         
         # Track usage statistics
         self.total_input_tokens += response.usage.prompt_tokens
@@ -180,14 +230,12 @@ Log content:
             # Standard processing without chunk context
             chunk_prompt = chunk
         
-        response = self.client.chat.completions.create(
-            model=self.model,
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": chunk_prompt}
-            ],
-            temperature=0.3
-        )
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": chunk_prompt}
+        ]
+        
+        response = self._api_call_with_retry(messages)
         
         # Track usage statistics
         self.total_input_tokens += response.usage.prompt_tokens
@@ -248,14 +296,12 @@ Chunk summaries to consolidate:
 {chr(10).join([f"--- Chunk {i+1} Summary ---{chr(10)}{summary}{chr(10)}" for i, summary in enumerate(summaries)])}
 """
         
-        response = self.client.chat.completions.create(
-            model=self.model,
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": combined_prompt}
-            ],
-            temperature=0.3
-        )
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": combined_prompt}
+        ]
+        
+        response = self._api_call_with_retry(messages)
         
         # Track usage statistics
         self.total_input_tokens += response.usage.prompt_tokens
@@ -327,11 +373,7 @@ Chunk summaries to consolidate:
             except Exception:
                 pass
 
-        response = self.client.chat.completions.create(
-            model=self.model,
-            messages=injected_messages,
-            temperature=0.3
-        )
+        response = self._api_call_with_retry(injected_messages)
         
         # Track usage statistics
         self.total_input_tokens += response.usage.prompt_tokens
