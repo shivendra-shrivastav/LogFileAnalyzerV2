@@ -345,7 +345,8 @@ Chunk summaries to consolidate:
         Set the processing method being used for cost tracking.
         
         Args:
-            method (str): Processing method ("Direct", "Basic Filtered", "ID-Based Turbo", "Metrics-only")
+            method (str): Processing method name
+                         Valid values: "Direct", "Basic Filtered", "ID-Based Turbo", "Metrics-only"
         """
         self.processing_method = method
     
