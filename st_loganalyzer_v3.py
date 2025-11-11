@@ -129,7 +129,7 @@ Notes:
 # Three-tier processing thresholds optimized for performance and cost
 TOKEN_THRESHOLD_FILTERING = 150000      # Switch to Basic processing (with filtering)
 TOKEN_THRESHOLD_TURBO_FILTERING = 500000  # Switch to Turbo processing (aggressive filtering)
-MAX_TOKENS_PER_CHUNK = 25000           # Safe chunk size within rate limits (30K TPM limit)
+MAX_TOKENS_PER_CHUNK = 20000           # Safe chunk size within rate limits (30K TPM limit)
 
 # Processing Tier Configuration:
 # Tier 1 - Direct: < 150K tokens (single API call, no filtering)
@@ -716,7 +716,7 @@ def process_with_chunking(
         if progress_callback:
             progress_callback(f"⚡ Optimizing chunk count ({len(chunks)} → target ~6 chunks)...")
         # Use larger chunks but stay within 30K TPM rate limit
-        larger_chunk_size = min(MAX_TOKENS_PER_CHUNK * 1.2, 28000)  # Max 28K to stay under 30K limit
+        larger_chunk_size = min(MAX_TOKENS_PER_CHUNK * 1.15, 23000)  # Max 23K to stay under 30K limit
         chunks = chunk_text_by_tokens(content, int(larger_chunk_size), llm_handler.model)
         if progress_callback:
             progress_callback(f"📦 Optimized to {len(chunks)} chunks")
@@ -726,7 +726,7 @@ def process_with_chunking(
         if progress_callback:
             progress_callback(f"🚀 Ultra-optimizing for large file ({len(chunks)} chunks)...")
         # Use maximum safe chunk size (stay under 30K TPM limit)
-        ultra_chunk_size = min(MAX_TOKENS_PER_CHUNK * 1.15, 28000)  # Max 28K tokens
+        ultra_chunk_size = min(MAX_TOKENS_PER_CHUNK * 1.1, 22000)  # Max 22K tokens
         chunks = chunk_text_by_tokens(content, int(ultra_chunk_size), llm_handler.model)
         if progress_callback:
             progress_callback(f"📦 Ultra-optimized to {len(chunks)} chunks")
