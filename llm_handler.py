@@ -86,11 +86,17 @@ class LLMHandler:
         """
         for attempt in range(max_retries):
             try:
-                response = self.client.chat.completions.create(
-                    model=self.model,
-                    messages=messages,
-                    temperature=0.3
-                )
+                # GPT-5 only supports temperature=1 (default), other models support 0.3
+                api_params = {
+                    "model": self.model,
+                    "messages": messages
+                }
+                
+                # Only set temperature for non-GPT-5 models
+                if self.model != "gpt-5":
+                    api_params["temperature"] = 0.3
+                
+                response = self.client.chat.completions.create(**api_params)
                 return response
             except Exception as e:
                 error_message = str(e)
