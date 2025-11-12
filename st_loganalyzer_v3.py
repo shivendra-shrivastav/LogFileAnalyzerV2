@@ -706,7 +706,24 @@ def process_with_chunking(
     Returns:
         Final combined summary
     """
-    chunks = chunk_text_by_tokens(content, MAX_TOKENS_PER_CHUNK, llm_handler.model)
+    # Model-specific rate limit configurations
+    # GPT-4.1: 30K TPM, GPT-5: 500K TPM
+    is_gpt5 = llm_handler.model == "gpt-5"
+    
+    if is_gpt5:
+        # GPT-5 has 500K TPM limit - can use much larger chunks
+        base_chunk_size = 80000  # 80K tokens per chunk
+        larger_chunk_size = 100000  # 100K for optimization
+        ultra_chunk_size = 120000  # 120K for ultra-optimization
+        delay_seconds = 0  # No delay needed with 500K TPM limit
+    else:
+        # GPT-4.1 has 30K TPM limit - use conservative chunks
+        base_chunk_size = MAX_TOKENS_PER_CHUNK  # 20K tokens
+        larger_chunk_size = 23000  # 23K max
+        ultra_chunk_size = 22000  # 22K max
+        delay_seconds = 3  # 3-second delay between chunks
+    
+    chunks = chunk_text_by_tokens(content, base_chunk_size, llm_handler.model)
     
     if progress_callback:
         progress_callback(f"📦 Split into {len(chunks)} chunks")
@@ -715,9 +732,7 @@ def process_with_chunking(
     if len(chunks) > 8:  # Reduced threshold from 10 to 8
         if progress_callback:
             progress_callback(f"⚡ Optimizing chunk count ({len(chunks)} → target ~6 chunks)...")
-        # Use larger chunks but stay within 30K TPM rate limit
-        larger_chunk_size = min(MAX_TOKENS_PER_CHUNK * 1.15, 23000)  # Max 23K to stay under 30K limit
-        chunks = chunk_text_by_tokens(content, int(larger_chunk_size), llm_handler.model)
+        chunks = chunk_text_by_tokens(content, larger_chunk_size, llm_handler.model)
         if progress_callback:
             progress_callback(f"📦 Optimized to {len(chunks)} chunks")
     
@@ -725,9 +740,7 @@ def process_with_chunking(
     if len(chunks) > 12:
         if progress_callback:
             progress_callback(f"🚀 Ultra-optimizing for large file ({len(chunks)} chunks)...")
-        # Use maximum safe chunk size (stay under 30K TPM limit)
-        ultra_chunk_size = min(MAX_TOKENS_PER_CHUNK * 1.1, 22000)  # Max 22K tokens
-        chunks = chunk_text_by_tokens(content, int(ultra_chunk_size), llm_handler.model)
+        chunks = chunk_text_by_tokens(content, ultra_chunk_size, llm_handler.model)
         if progress_callback:
             progress_callback(f"📦 Ultra-optimized to {len(chunks)} chunks")
     
@@ -743,11 +756,11 @@ def process_with_chunking(
         )
         chunk_summaries.append(summary)
         
-        # Add delay between chunks to respect TPM rate limit (30K tokens/min)
-        # Wait 3 seconds between chunks to stay under limit
-        if i < len(chunks) - 1:  # Don't wait after last chunk
+        # Add delay between chunks to respect TPM rate limit (GPT-4.1: 30K TPM, GPT-5: 500K TPM)
+        # Only delay for GPT-4.1 to stay under limit; GPT-5 doesn't need delays
+        if i < len(chunks) - 1 and delay_seconds > 0:  # Don't wait after last chunk
             import time
-            time.sleep(3)
+            time.sleep(delay_seconds)
     
     # Combine summaries
     if progress_callback:
