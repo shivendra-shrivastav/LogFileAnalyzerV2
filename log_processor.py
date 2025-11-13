@@ -266,11 +266,21 @@ def filter_log_content(content: str, filtering_level: str = "basic") -> str:
     lines = content.split('\n')
     filtered_lines = []
     
+    # IMPORTANT: Always preserve first and last portions of the log
+    PRESERVE_FIRST_LINES = 50   # Keep first 50 lines (startup, initialization)
+    PRESERVE_LAST_LINES = 50    # Keep last 50 lines (shutdown, final events)
+    total_lines = len(lines)
+    
     if filtering_level == "basic":
         # Basic filtering: remove empty lines and some status messages
-        for line in lines:
+        for i, line in enumerate(lines):
+            line_number = i + 1
+            
+            # Always keep first and last portions
+            if line_number <= PRESERVE_FIRST_LINES or line_number > (total_lines - PRESERVE_LAST_LINES):
+                filtered_lines.append(line)
             # Always keep lines with critical IDs
-            if any(critical_id in line for critical_id in CRITICAL_IDS.keys()):
+            elif any(critical_id in line for critical_id in CRITICAL_IDS.keys()):
                 filtered_lines.append(line)
             # Remove empty lines and excessive whitespace
             elif line.strip() and not all(status_id in line for status_id in STATUS_IDS.keys()):
@@ -279,9 +289,14 @@ def filter_log_content(content: str, filtering_level: str = "basic") -> str:
     elif filtering_level == "advanced":
         # Advanced filtering: more aggressive noise reduction
         status_counter = 0
-        for line in lines:
+        for i, line in enumerate(lines):
+            line_number = i + 1
+            
+            # Always keep first and last portions
+            if line_number <= PRESERVE_FIRST_LINES or line_number > (total_lines - PRESERVE_LAST_LINES):
+                filtered_lines.append(line)
             # Always preserve critical events
-            if any(critical_id in line for critical_id in CRITICAL_IDS.keys()):
+            elif any(critical_id in line for critical_id in CRITICAL_IDS.keys()):
                 filtered_lines.append(line)
             # Sample status messages (keep 1 in 10)
             elif any(status_id in line for status_id in STATUS_IDS.keys()):

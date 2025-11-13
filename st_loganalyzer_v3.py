@@ -466,6 +466,11 @@ def fast_preprocess_content(log_content: str) -> str:
     lines = log_content.split('\n')
     filtered_lines = []
     
+    # IMPORTANT: Always preserve first and last portions of the log
+    PRESERVE_FIRST_LINES = 50   # Keep first 50 lines (startup, initialization)
+    PRESERVE_LAST_LINES = 50    # Keep last 50 lines (shutdown, final events)
+    total_lines = len(lines)
+    
     # Define patterns to skip entirely (most verbose noise)
     skip_patterns = [
         'Interface-Statistic',  # Network statistics
@@ -488,6 +493,11 @@ def fast_preprocess_content(log_content: str) -> str:
     line_count = 0
     for line in lines:
         line_count += 1
+        
+        # Always keep first and last portions (critical context)
+        if line_count <= PRESERVE_FIRST_LINES or line_count > (total_lines - PRESERVE_LAST_LINES):
+            filtered_lines.append(line)
+            continue
         
         # Skip empty lines
         if not line.strip():
