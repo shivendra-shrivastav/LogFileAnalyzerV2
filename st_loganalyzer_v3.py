@@ -1001,10 +1001,7 @@ def main():
         st.markdown("### 🔧 Processing Options")
     
     with col2:
-        force_metrics = st.checkbox(
-            "🚀 Force Metrics-Only Mode", 
-            help="Skip LLM processing and use fast metrics extraction for any file size (Zero cost)"
-        )
+        force_metrics = False  # Metrics-only mode removed from UI
     
     # Sidebar settings
     with st.sidebar:
@@ -1308,7 +1305,7 @@ def main():
         
         # Check if LLM is available for follow-up
         if st.session_state.get('llm_handler') is None and st.session_state.processing_stats.get('strategy', '').startswith('Metrics-only'):
-            st.info("💡 **Note**: Follow-up questions require LLM processing. Metrics-only analysis doesn't support chat. Uncheck 'Force Metrics-Only Mode' to enable chat.")
+            st.info("💡 **Note**: Follow-up questions require LLM processing. Metrics-only analysis doesn't support chat.")
         elif st.session_state.processing_stats.get('strategy', '').endswith('+ LLM'):
             st.info("✅ **Chat Available**: This file was processed with LLM analysis - ask questions about the logs!")
         
