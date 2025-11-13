@@ -568,6 +568,10 @@ def create_turbo_filtered_content_with_stats(log_content: str) -> tuple[str, dic
     filtered_lines = []
     original_lines = len(lines)
     
+    # IMPORTANT: Always preserve first and last portions of the log
+    PRESERVE_FIRST_LINES = 100  # Keep first 100 lines (startup, initialization)
+    PRESERVE_LAST_LINES = 100   # Keep last 100 lines (shutdown, final events)
+    
     # Statistics tracking
     stats = {
         'original_lines': original_lines,
@@ -577,6 +581,7 @@ def create_turbo_filtered_content_with_stats(log_content: str) -> tuple[str, dic
         'headers_kept': 0,
         'high_cpu_alerts_kept': 0,
         'routine_sampled': 0,
+        'first_last_preserved': 0,
         'filtered_lines': 0,
         'line_reduction': 0.0,
         'lines_removed': 0
@@ -589,6 +594,12 @@ def create_turbo_filtered_content_with_stats(log_content: str) -> tuple[str, dic
         line_count += 1
         
         if not line.strip():
+            continue
+        
+        # 0. ALWAYS KEEP: First and last portions of log (critical for context)
+        if line_count <= PRESERVE_FIRST_LINES or line_count > (original_lines - PRESERVE_LAST_LINES):
+            filtered_lines.append(line)
+            stats['first_last_preserved'] += 1
             continue
         
         # 1. ALWAYS KEEP: File boundaries and headers
@@ -674,6 +685,7 @@ def create_turbo_filtered_content_with_stats(log_content: str) -> tuple[str, dic
 # Reduction: {line_reduction:.1f}%
 #
 # CONTENT PRESERVED:
+# - First/Last lines preserved: {stats['first_last_preserved']}
 # - Critical events: {stats['critical_events_kept']}
 # - Essential patterns: {stats['essential_patterns_kept']}
 # - Headers/boundaries: {stats['headers_kept']}
